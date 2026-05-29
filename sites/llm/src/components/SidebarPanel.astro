@@ -34,6 +34,9 @@
     const savedWidth = localStorage.getItem('sidebar-width');
     if (savedWidth) {
       sidebar.style.width = savedWidth;
+      // 同步按钮位置
+      if (toggleBtn) toggleBtn.style.left = savedWidth;
+      if (resizer) resizer.style.left = savedWidth;
     }
 
     // 收起/展开侧边栏
@@ -44,11 +47,13 @@
         sidebar.classList.add('collapsed');
         mainPane.classList.add('sidebar-collapsed');
         expandBtn?.classList.add('visible');
+        toggleBtn?.classList.add('hidden');
         resizer?.classList.add('hidden');
       } else {
         sidebar.classList.remove('collapsed');
         mainPane.classList.remove('sidebar-collapsed');
         expandBtn?.classList.remove('visible');
+        toggleBtn?.classList.remove('hidden');
         resizer?.classList.remove('hidden');
       }
       localStorage.setItem('sidebar-collapsed', String(isCollapsed));
@@ -87,6 +92,9 @@
       const diff = e.clientX - startX;
       const newWidth = Math.max(200, Math.min(500, startWidth + diff));
       sidebar.style.width = `${newWidth}px`;
+      // 同步按钮位置
+      if (toggleBtn) toggleBtn.style.left = `${newWidth}px`;
+      if (resizer) resizer.style.left = `${newWidth}px`;
     });
 
     document.addEventListener('mouseup', () => {
@@ -114,7 +122,7 @@
   /* 侧边栏收起按钮 */
   .sidebar-toggle {
     position: fixed;
-    top: 80px;
+    top: 70px;
     left: 260px;
     width: 24px;
     height: 48px;
@@ -129,7 +137,6 @@
     color: var(--sl-color-gray-3);
     z-index: 100;
     transition: all 0.3s;
-    opacity: 0;
   }
 
   .sidebar-toggle:hover {
@@ -138,16 +145,15 @@
     width: 28px;
   }
 
-  /* 鼠标进入侧边栏区域时显示按钮 */
-  .sidebar-pane:hover ~ .sidebar-toggle,
-  .sidebar-toggle:hover {
-    opacity: 1;
+  .sidebar-toggle.hidden {
+    opacity: 0;
+    pointer-events: none;
   }
 
   /* 侧边栏展开按钮 */
   .sidebar-expand {
     position: fixed;
-    top: 80px;
+    top: 70px;
     left: 0;
     width: 32px;
     height: 48px;
@@ -181,7 +187,7 @@
     position: fixed;
     top: 0;
     left: 260px;
-    width: 4px;
+    width: 6px;
     height: 100vh;
     cursor: col-resize;
     z-index: 99;
