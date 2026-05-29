@@ -1,12 +1,12 @@
 ---
 import Default from '@astrojs/starlight/components/MarkdownContent.astro';
 import CommentsWrapper from './CommentsWrapper.astro';
-import AIChat from './AIChat.astro';
 import AdminPanel from './AdminPanel.astro';
 import UserAuth from './UserAuth.astro';
 import BackToTop from './BackToTop.astro';
 import TableOfContentsHighlight from './TableOfContentsHighlight.astro';
 import SearchEnhance from './SearchEnhance.astro';
+import SidebarPanel from './SidebarPanel.astro';
 
 const { ...props } = Astro.props;
 ---
@@ -15,9 +15,9 @@ const { ...props } = Astro.props;
   <slot />
 </Default>
 
+<SidebarPanel />
 <UserAuth />
 <CommentsWrapper />
-<AIChat />
 <AdminPanel />
 <BackToTop />
 <TableOfContentsHighlight />
