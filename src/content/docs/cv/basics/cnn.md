@@ -3,8 +3,6 @@ title: CNN 基础
 description: 卷积神经网络（Convolutional Neural Network）的核心概念与经典架构
 ---
 
-# CNN 基础
-
 ## 一句话解释
 
 卷积神经网络（CNN, Convolutional Neural Network）是一种专门处理网格结构数据（如图像）的深度学习模型，通过卷积操作自动提取局部特征，再逐层组合成高级语义特征。
