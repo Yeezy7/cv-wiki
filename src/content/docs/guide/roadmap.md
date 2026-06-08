@@ -1,6 +1,10 @@
 ---
 title: 学习路线
 description: AI Wiki 推荐的多领域学习路径
+category: guide
+tags: [roadmap, learning-path]
+status: stable
+order: 2
 ---
 
 # 学习路线

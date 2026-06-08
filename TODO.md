@@ -5,17 +5,48 @@
 - [x] 多领域架构（CV、LLM、多模态）
 - [x] 独立领域侧边栏
 - [x] 文章元信息（最后更新时间、编辑链接）
-- [x] 评论系统（Giscus）
-- [x] AI 问答（可自定义 API）
-- [x] 后台管理（GitHub API）
-- [x] 用户权限系统（GitHub OAuth）
+- [x] 评论入口（Giscus 可配置，未配置时显示说明）
+- [x] GitHub 贡献面板（编辑当前页、新增文章、提交 Issue）
 - [x] 移动端适配优化
 - [x] 返回顶部按钮
 - [x] 自定义样式系统
 - [x] 搜索功能增强（快捷键 ⌘K、搜索高亮）
 - [x] 图片懒加载
-- [x] SEO 优化（meta 标签、结构化数据）
+- [x] SEO 优化（Starlight Head + 结构化数据）
 - [x] 文章目录导航优化（滚动高亮）
+- [x] 共享组件同步脚本（根站组件同步到各子站）
+- [x] Starlight UI 中文化配置
+- [x] 共享组件漂移检查（`npm run check:shared`）
+- [x] 文章 frontmatter 校验（`npm run validate:content`）
+- [x] 内部链接与锚点校验（`npm run validate:links`）
+- [x] npm workspaces 子站脚本管理
+- [x] 全站内容索引刷新脚本（`npm run sync:content`）
+
+## 待配置功能
+
+### Giscus 评论
+
+- **优先级**：中
+- **复杂度**：低
+- **描述**：当前评论组件已经接入可配置逻辑，但需要补充 Giscus 的仓库 ID 和分类 ID。
+- **配置项**：
+  - `PUBLIC_GISCUS_REPO`
+  - `PUBLIC_GISCUS_REPO_ID`
+  - `PUBLIC_GISCUS_CATEGORY`
+  - `PUBLIC_GISCUS_CATEGORY_ID`
+
+### AI 问答
+
+- **优先级**：低
+- **复杂度**：中
+- **状态**：暂不启用
+- **描述**：当前保留 `AIChat.astro` 源码，但不挂载到页面。后续如果开启，应先补后端代理或明确浏览器端密钥方案，避免把真实 API Key 暴露给访问者。
+
+### 真实用户权限 / 在线后台
+
+- **优先级**：低
+- **复杂度**：高
+- **描述**：静态站不再保留假的 GitHub OAuth 和浏览器端 Token 后台。若以后需要真实后台，应新增后端服务或 GitHub App。
 
 ## 待实现功能
 

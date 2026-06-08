@@ -1,6 +1,10 @@
 ---
 title: 损失函数
 description: 深度学习中常用损失函数的原理、分类与工程实践
+category: cv
+tags: [loss, optimization, basics]
+status: stable
+order: 4
 ---
 
 # 损失函数

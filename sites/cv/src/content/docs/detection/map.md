@@ -1,6 +1,10 @@
 ---
 title: 平均精度均值（mAP）
 description: 目标检测最核心的评估指标，理解 AP 和 mAP 的计算方式
+category: cv
+tags: [map, object-detection, metrics]
+status: stable
+order: 4
 ---
 
 # 平均精度均值（mAP）

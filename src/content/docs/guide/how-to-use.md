@@ -1,6 +1,10 @@
 ---
 title: 如何使用
 description: AI Wiki 的使用方法和文章结构说明
+category: guide
+tags: [guide, usage]
+status: stable
+order: 1
 ---
 
 # 如何使用

@@ -1,17 +1,17 @@
 ---
 ---
 
-<div class="ai-chat-container">
+<div class="ai-chat-container collapsed" id="ai-chat-container">
   <div class="ai-chat-header">
     <h3>AI 问答助手</h3>
-    <button id="toggle-chat" class="toggle-btn" aria-label="展开/收起">
+    <button id="toggle-chat" class="toggle-btn collapsed" aria-label="展开/收起">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <polyline points="6 9 12 15 18 9"></polyline>
       </svg>
     </button>
   </div>
 
-  <div class="ai-chat-body" id="chat-body">
+  <div class="ai-chat-body collapsed" id="chat-body">
     <div class="ai-chat-messages" id="chat-messages">
       <div class="message ai-message">
         <div class="message-content">
@@ -39,6 +39,7 @@
       <details>
         <summary>API 设置</summary>
         <div class="settings-form">
+          <p class="settings-note">API Key 只保存在当前浏览器。请使用支持浏览器跨域请求的 OpenAI 兼容接口。</p>
           <div class="form-group">
             <label for="api-url">API 地址</label>
             <input
@@ -61,8 +62,8 @@
             <input
               type="text"
               id="api-model"
-              placeholder="gpt-3.5-turbo"
-              value="gpt-3.5-turbo"
+              placeholder="gpt-4o-mini 或兼容模型名"
+              value="gpt-4o-mini"
             />
           </div>
           <button id="save-settings" class="save-btn">保存设置</button>
@@ -86,7 +87,7 @@
       return saved ? JSON.parse(saved) : {
         apiUrl: 'https://api.openai.com/v1/chat/completions',
         apiKey: '',
-        model: 'gpt-3.5-turbo'
+        model: 'gpt-4o-mini'
       };
     }
 
@@ -97,10 +98,13 @@
     init() {
       // 切换聊天窗口
       document.getElementById('toggle-chat')?.addEventListener('click', () => {
+        const container = document.getElementById('ai-chat-container');
         const body = document.getElementById('chat-body');
         const btn = document.getElementById('toggle-chat');
+        container?.classList.toggle('collapsed');
         body?.classList.toggle('collapsed');
         btn?.classList.toggle('collapsed');
+        localStorage.setItem('ai-chat-open', String(!body?.classList.contains('collapsed')));
       });
 
       // 发送消息
@@ -123,6 +127,16 @@
 
       // 加载已保存的设置
       this.loadSettingsToForm();
+      this.restoreOpenState();
+    }
+
+    restoreOpenState() {
+      const isOpen = localStorage.getItem('ai-chat-open') === 'true';
+      if (!isOpen) return;
+
+      document.getElementById('ai-chat-container')?.classList.remove('collapsed');
+      document.getElementById('chat-body')?.classList.remove('collapsed');
+      document.getElementById('toggle-chat')?.classList.remove('collapsed');
     }
 
     loadSettingsToForm() {
@@ -260,6 +274,10 @@
     overflow: hidden;
   }
 
+  .ai-chat-container.collapsed {
+    width: 220px;
+  }
+
   .ai-chat-header {
     display: flex;
     justify-content: space-between;
@@ -289,8 +307,17 @@
     background: rgba(255, 255, 255, 0.2);
   }
 
+  .toggle-btn svg {
+    transform: rotate(180deg);
+    transition: transform 0.2s;
+  }
+
   .toggle-btn.collapsed svg {
     transform: rotate(180deg);
+  }
+
+  .toggle-btn:not(.collapsed) svg {
+    transform: rotate(0deg);
   }
 
   .ai-chat-body {
@@ -389,6 +416,13 @@
   .ai-chat-settings {
     padding: 12px 16px;
     border-top: 1px solid var(--sl-color-hairline);
+  }
+
+  .settings-note {
+    margin: 0 0 12px;
+    color: var(--sl-color-gray-2);
+    font-size: 0.8rem;
+    line-height: 1.5;
   }
 
   .ai-chat-settings details summary {

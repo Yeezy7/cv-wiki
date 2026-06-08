@@ -22,7 +22,7 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const sidebar = document.querySelector('.sidebar-pane');
+    const sidebar = document.querySelector('#starlight__sidebar');
     const mainPane = document.querySelector('.main-pane');
     const toggleBtn = document.getElementById('sidebar-toggle');
     const expandBtn = document.getElementById('sidebar-expand');
@@ -118,7 +118,7 @@
   });
 </script>
 
-<style>
+<style is:global>
   /* 侧边栏收起按钮 */
   .sidebar-toggle {
     position: fixed;
@@ -203,7 +203,7 @@
   }
 
   /* 侧边栏收起状态 */
-  :global(.sidebar-pane.collapsed) {
+  #starlight__sidebar.collapsed {
     transform: translateX(-100%);
     width: 0 !important;
     min-width: 0;
@@ -212,12 +212,12 @@
     padding: 0;
   }
 
-  :global(.main-pane.sidebar-collapsed) {
+  .main-pane.sidebar-collapsed {
     margin-left: 0 !important;
   }
 
   /* 侧边栏独立感 */
-  :global(.sidebar-pane) {
+  #starlight__sidebar {
     border-right: 1px solid var(--sl-color-hairline);
     box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
     transition: transform 0.3s ease, width 0.3s ease;

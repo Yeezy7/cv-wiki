@@ -1,6 +1,10 @@
 ---
 title: 非极大值抑制（NMS）
 description: 目标检测后处理的核心算法，去除冗余检测框
+category: cv
+tags: [nms, object-detection, post-processing]
+status: stable
+order: 3
 ---
 
 # 非极大值抑制（NMS）

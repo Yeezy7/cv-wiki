@@ -1,6 +1,10 @@
 ---
 title: BatchNorm
 description: 批归一化（Batch Normalization）的原理、计算过程与工程实践
+category: cv
+tags: [batchnorm, normalization, basics]
+status: stable
+order: 2
 ---
 
 # BatchNorm

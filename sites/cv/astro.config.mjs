@@ -8,7 +8,14 @@ export default defineConfig({
     starlight({
       title: 'CV Wiki',
       description: '计算机视觉知识库',
+      locales: {
+        root: {
+          label: '简体中文',
+          lang: 'zh-CN',
+        },
+      },
       components: {
+        Head: './src/components/Head.astro',
         SiteTitle: './src/components/SiteTitle.astro',
         MarkdownContent: './src/components/MarkdownContent.astro',
       },

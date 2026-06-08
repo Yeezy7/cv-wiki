@@ -1,6 +1,10 @@
 ---
 title: 图像分割综述
 description: 语义分割、实例分割、全景分割的区别、代表方法与评估指标一文讲清
+category: cv
+tags: [segmentation, overview]
+status: stable
+order: 1
 ---
 
 # 图像分割综述

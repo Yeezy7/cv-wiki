@@ -1,9 +1,12 @@
 ---
+const repoUrl = 'https://github.com/Yeezy7/ai-wiki';
+const newArticleUrl = `${repoUrl}/new/main/src/content/docs`;
+const issueUrl = `${repoUrl}/issues/new`;
 ---
 
-<div class="admin-panel" id="admin-panel">
+<div class="admin-panel" id="admin-panel" aria-hidden="true">
   <div class="admin-header">
-    <h2>内容管理</h2>
+    <h2>贡献入口</h2>
     <button id="close-admin" class="close-btn" aria-label="关闭">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -13,359 +16,60 @@
   </div>
 
   <div class="admin-content">
-    <!-- GitHub Token 配置 -->
-    <div class="admin-section">
-      <h3>GitHub 配置</h3>
-      <div class="form-group">
-        <label for="github-token">Personal Access Token</label>
-        <input
-          type="password"
-          id="github-token"
-          placeholder="ghp_..."
-        />
-        <small>需要 repo 权限</small>
-      </div>
-      <button id="save-token" class="btn btn-primary">保存 Token</button>
-    </div>
+    <section class="admin-section">
+      <h3>编辑当前页面</h3>
+      <p>使用页面底部的 Starlight 编辑链接，直接在 GitHub 创建修改。</p>
+      <a id="current-page-edit" class="btn btn-primary" href={repoUrl}>打开编辑页</a>
+    </section>
 
-    <!-- 文件列表 -->
-    <div class="admin-section">
-      <h3>文章列表</h3>
-      <div class="file-list" id="file-list">
-        <p class="loading">加载中...</p>
-      </div>
-    </div>
+    <section class="admin-section">
+      <h3>新增内容</h3>
+      <p>新增文章请放到对应领域目录，并按贡献指南补齐 frontmatter 与文章结构。</p>
+      <a class="btn btn-secondary" href={newArticleUrl}>创建新文章</a>
+    </section>
 
-    <!-- 编辑器 -->
-    <div class="admin-section editor-section" id="editor-section" style="display: none;">
-      <h3>
-        编辑文章
-        <span id="current-file" class="file-name"></span>
-      </h3>
-      <div class="editor-toolbar">
-        <button id="save-file" class="btn btn-primary">保存</button>
-        <button id="cancel-edit" class="btn btn-secondary">取消</button>
-        <span id="save-status" class="save-status"></span>
-      </div>
-      <textarea id="editor" class="editor-textarea" rows="20"></textarea>
-    </div>
-
-    <!-- 创建新文章 -->
-    <div class="admin-section">
-      <h3>创建新文章</h3>
-      <div class="form-group">
-        <label for="new-file-path">文件路径</label>
-        <input
-          type="text"
-          id="new-file-path"
-          placeholder="cv/basics/new-article.md"
-        />
-      </div>
-      <div class="form-group">
-        <label for="new-file-content">内容</label>
-        <textarea
-          id="new-file-content"
-          class="editor-textarea"
-          rows="10"
-          placeholder="---
-title: 新文章标题
-description: 文章描述
----
-
-# 新文章标题
-
-内容..."
-        ></textarea>
-      </div>
-      <button id="create-file" class="btn btn-primary">创建文章</button>
-    </div>
+    <section class="admin-section">
+      <h3>反馈问题</h3>
+      <p>如果发现公式、代码、链接或表述问题，可以直接提交 Issue。</p>
+      <a class="btn btn-secondary" href={issueUrl}>提交 Issue</a>
+    </section>
   </div>
 </div>
 
-<!-- 管理面板触发按钮 -->
-<button id="admin-trigger" class="admin-trigger" aria-label="打开管理面板">
+<button id="admin-trigger" class="admin-trigger" aria-label="打开贡献入口" title="贡献入口">
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-    <circle cx="12" cy="12" r="3"></circle>
-    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+    <path d="M12 5v14"></path>
+    <path d="M5 12h14"></path>
   </svg>
 </button>
 
 <script>
-  class AdminPanel {
-    constructor() {
-      this.token = localStorage.getItem('github-token') || '';
-      this.repo = 'Yeezy7/ai-wiki';
-      this.currentFile = null;
-      this.init();
-      this.checkPermission();
-    }
-
-    checkPermission() {
-      // 检查用户是否有管理权限
-      const user = JSON.parse(localStorage.getItem('user') || 'null');
-      if (!user || !['admin', 'editor'].includes(user.role)) {
-        // 隐藏管理面板触发按钮
-        const trigger = document.getElementById('admin-trigger');
-        if (trigger) trigger.style.display = 'none';
-      }
-    }
-
-    init() {
-      // 打开/关闭管理面板
-      document.getElementById('admin-trigger')?.addEventListener('click', () => {
-        document.getElementById('admin-panel')?.classList.add('open');
-        this.loadFiles();
-      });
-
-      document.getElementById('close-admin')?.addEventListener('click', () => {
-        document.getElementById('admin-panel')?.classList.remove('open');
-      });
-
-      // 保存 Token
-      document.getElementById('save-token')?.addEventListener('click', () => {
-        const tokenInput = document.getElementById('github-token');
-        if (tokenInput) {
-          this.token = tokenInput.value;
-          localStorage.setItem('github-token', this.token);
-          alert('Token 已保存！');
-          this.loadFiles();
-        }
-      });
-
-      // 加载已保存的 Token
-      const tokenInput = document.getElementById('github-token');
-      if (tokenInput && this.token) {
-        tokenInput.value = this.token;
-      }
-
-      // 保存文件
-      document.getElementById('save-file')?.addEventListener('click', () => this.saveFile());
-
-      // 取消编辑
-      document.getElementById('cancel-edit')?.addEventListener('click', () => {
-        document.getElementById('editor-section')?.style.setProperty('display', 'none');
-        this.currentFile = null;
-      });
-
-      // 创建文件
-      document.getElementById('create-file')?.addEventListener('click', () => this.createFile());
-    }
-
-    async loadFiles() {
-      const fileList = document.getElementById('file-list');
-      if (!fileList) return;
-
-      if (!this.token) {
-        fileList.innerHTML = '<p class="error">请先配置 GitHub Token</p>';
-        return;
-      }
-
-      try {
-        // 获取仓库内容
-        const response = await fetch(`https://api.github.com/repos/${this.repo}/contents/src/content/docs`, {
-          headers: {
-            'Authorization': `token ${this.token}`,
-            'Accept': 'application/vnd.github.v3+json'
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error('加载失败');
-        }
-
-        const files = await response.json();
-        this.renderFileList(files, fileList, '');
-      } catch (error) {
-        fileList.innerHTML = `<p class="error">错误：${error.message}</p>`;
-      }
-    }
-
-    renderFileList(files, container, path) {
-      let html = '<ul class="file-list-items">';
-
-      for (const file of files) {
-        if (file.type === 'file' && file.name.endsWith('.md')) {
-          html += `
-            <li class="file-item">
-              <button class="file-btn" data-path="${file.path}" data-sha="${file.sha}">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                </svg>
-                ${file.name}
-              </button>
-            </li>
-          `;
-        } else if (file.type === 'dir') {
-          html += `
-            <li class="file-item directory">
-              <button class="dir-btn" data-path="${file.path}">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                </svg>
-                ${file.name}
-              </button>
-            </li>
-          `;
-        }
-      }
-
-      html += '</ul>';
-      container.innerHTML = html;
-
-      // 绑定点击事件
-      container.querySelectorAll('.file-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const path = e.currentTarget.dataset.path;
-          const sha = e.currentTarget.dataset.sha;
-          this.editFile(path, sha);
-        });
-      });
-
-      container.querySelectorAll('.dir-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          const path = e.currentTarget.dataset.path;
-          await this.loadDirectory(path, e.currentTarget.parentElement);
-        });
-      });
-    }
-
-    async loadDirectory(path, parentItem) {
-      try {
-        const response = await fetch(`https://api.github.com/repos/${this.repo}/contents/${path}`, {
-          headers: {
-            'Authorization': `token ${this.token}`,
-            'Accept': 'application/vnd.github.v3+json'
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error('加载失败');
-        }
-
-        const files = await response.json();
-        const subList = document.createElement('div');
-        subList.className = 'sub-directory';
-        this.renderFileList(files, subList, path);
-        parentItem.appendChild(subList);
-      } catch (error) {
-        alert(`错误：${error.message}`);
-      }
-    }
-
-    async editFile(path, sha) {
-      try {
-        const response = await fetch(`https://api.github.com/repos/${this.repo}/contents/${path}`, {
-          headers: {
-            'Authorization': `token ${this.token}`,
-            'Accept': 'application/vnd.github.v3+json'
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error('获取文件失败');
-        }
-
-        const file = await response.json();
-        const content = atob(file.content);
-
-        this.currentFile = { path, sha: file.sha };
-
-        document.getElementById('current-file').textContent = path;
-        document.getElementById('editor').value = content;
-        document.getElementById('editor-section').style.setProperty('display', 'block');
-      } catch (error) {
-        alert(`错误：${error.message}`);
-      }
-    }
-
-    async saveFile() {
-      if (!this.currentFile) return;
-
-      const content = document.getElementById('editor')?.value;
-      if (!content) return;
-
-      const statusEl = document.getElementById('save-status');
-      if (statusEl) statusEl.textContent = '保存中...';
-
-      try {
-        const response = await fetch(`https://api.github.com/repos/${this.repo}/contents/${this.currentFile.path}`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `token ${this.token}`,
-            'Accept': 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            message: `Update ${this.currentFile.path}`,
-            content: btoa(content),
-            sha: this.currentFile.sha
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error('保存失败');
-        }
-
-        const result = await response.json();
-        this.currentFile.sha = result.content.sha;
-
-        if (statusEl) {
-          statusEl.textContent = '已保存';
-          statusEl.classList.add('success');
-          setTimeout(() => {
-            statusEl.textContent = '';
-            statusEl.classList.remove('success');
-          }, 2000);
-        }
-      } catch (error) {
-        if (statusEl) {
-          statusEl.textContent = `错误：${error.message}`;
-          statusEl.classList.add('error');
-        }
-      }
-    }
-
-    async createFile() {
-      const path = document.getElementById('new-file-path')?.value;
-      const content = document.getElementById('new-file-content')?.value;
-
-      if (!path || !content) {
-        alert('请填写文件路径和内容');
-        return;
-      }
-
-      try {
-        const response = await fetch(`https://api.github.com/repos/${this.repo}/contents/src/content/docs/${path}`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `token ${this.token}`,
-            'Accept': 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            message: `Create ${path}`,
-            content: btoa(content)
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error('创建失败');
-        }
-
-        alert('文章创建成功！');
-        document.getElementById('new-file-path').value = '';
-        document.getElementById('new-file-content').value = '';
-        this.loadFiles();
-      } catch (error) {
-        alert(`错误：${error.message}`);
-      }
-    }
-  }
-
-  // 初始化
   document.addEventListener('DOMContentLoaded', () => {
-    new AdminPanel();
+    const panel = document.getElementById('admin-panel');
+    const trigger = document.getElementById('admin-trigger');
+    const closeBtn = document.getElementById('close-admin');
+    const editLink = document.getElementById('current-page-edit');
+    const starlightEditLink = document.querySelector('footer a[href*="/edit/main/"]');
+
+    if (editLink && starlightEditLink instanceof HTMLAnchorElement) {
+      editLink.href = starlightEditLink.href;
+    }
+
+    function openPanel() {
+      panel?.classList.add('open');
+      panel?.setAttribute('aria-hidden', 'false');
+    }
+
+    function closePanel() {
+      panel?.classList.remove('open');
+      panel?.setAttribute('aria-hidden', 'true');
+    }
+
+    trigger?.addEventListener('click', openPanel);
+    closeBtn?.addEventListener('click', closePanel);
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closePanel();
+    });
   });
 </script>
 
@@ -390,7 +94,7 @@ description: 文章描述
   }
 
   .admin-trigger:hover {
-    transform: scale(1.1);
+    transform: scale(1.08);
     background: var(--sl-color-accent-high);
   }
 
@@ -398,13 +102,14 @@ description: 文章描述
     position: fixed;
     top: 0;
     right: -500px;
-    width: 450px;
+    width: min(450px, 100vw);
     height: 100vh;
     background: var(--sl-color-bg-nav);
     border-left: 1px solid var(--sl-color-hairline);
     z-index: 1001;
     transition: right 0.3s ease;
     overflow-y: auto;
+    box-shadow: -8px 0 24px rgba(0, 0, 0, 0.25);
   }
 
   .admin-panel.open {
@@ -418,9 +123,6 @@ description: 文章描述
     padding: 16px 20px;
     background: var(--sl-color-accent);
     color: white;
-    position: sticky;
-    top: 0;
-    z-index: 10;
   }
 
   .admin-header h2 {
@@ -447,59 +149,35 @@ description: 文章描述
 
   .admin-section {
     margin-bottom: 24px;
-    padding-bottom: 24px;
+    padding-bottom: 20px;
     border-bottom: 1px solid var(--sl-color-hairline);
   }
 
+  .admin-section:last-child {
+    border-bottom: none;
+  }
+
   .admin-section h3 {
-    margin: 0 0 16px 0;
-    font-size: 1rem;
+    margin: 0 0 8px;
     color: var(--sl-color-white);
   }
 
-  .form-group {
-    margin-bottom: 12px;
-  }
-
-  .form-group label {
-    display: block;
-    font-size: 0.85rem;
-    margin-bottom: 4px;
+  .admin-section p {
+    margin: 0 0 14px;
     color: var(--sl-color-gray-2);
-  }
-
-  .form-group input,
-  .form-group textarea {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid var(--sl-color-hairline);
-    border-radius: 6px;
-    background: var(--sl-color-bg);
-    color: var(--sl-color-white);
-    font-size: 0.85rem;
-    font-family: inherit;
-  }
-
-  .form-group input:focus,
-  .form-group textarea:focus {
-    outline: none;
-    border-color: var(--sl-color-accent);
-  }
-
-  .form-group small {
-    display: block;
-    margin-top: 4px;
-    font-size: 0.75rem;
-    color: var(--sl-color-gray-4);
+    line-height: 1.6;
   }
 
   .btn {
-    padding: 8px 16px;
-    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
     border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: background 0.2s;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
   }
 
   .btn-primary {
@@ -514,118 +192,19 @@ description: 文章描述
   .btn-secondary {
     background: var(--sl-color-gray-6);
     color: var(--sl-color-white);
+    border: 1px solid var(--sl-color-hairline);
   }
 
   .btn-secondary:hover {
     background: var(--sl-color-gray-5);
   }
 
-  .file-list {
-    max-height: 300px;
-    overflow-y: auto;
-  }
-
-  .file-list-items {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .file-item {
-    margin-bottom: 4px;
-  }
-
-  .file-btn,
-  .dir-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    padding: 8px 12px;
-    background: none;
-    border: none;
-    color: var(--sl-color-white);
-    cursor: pointer;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    text-align: left;
-  }
-
-  .file-btn:hover,
-  .dir-btn:hover {
-    background: var(--sl-color-gray-6);
-  }
-
-  .sub-directory {
-    margin-left: 24px;
-  }
-
-  .editor-section {
-    background: var(--sl-color-bg);
-    padding: 16px;
-    border-radius: 8px;
-    border: 1px solid var(--sl-color-hairline);
-  }
-
-  .file-name {
-    font-size: 0.85rem;
-    color: var(--sl-color-gray-3);
-    font-weight: normal;
-  }
-
-  .editor-toolbar {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
-    align-items: center;
-  }
-
-  .save-status {
-    font-size: 0.85rem;
-    margin-left: auto;
-  }
-
-  .save-status.success {
-    color: var(--sl-color-green);
-  }
-
-  .save-status.error {
-    color: var(--sl-color-red);
-  }
-
-  .editor-textarea {
-    width: 100%;
-    min-height: 200px;
-    padding: 12px;
-    border: 1px solid var(--sl-color-hairline);
-    border-radius: 6px;
-    background: var(--sl-color-bg-nav);
-    color: var(--sl-color-white);
-    font-family: monospace;
-    font-size: 0.85rem;
-    line-height: 1.5;
-    resize: vertical;
-  }
-
-  .editor-textarea:focus {
-    outline: none;
-    border-color: var(--sl-color-accent);
-  }
-
-  .loading,
-  .error {
-    font-size: 0.85rem;
-    color: var(--sl-color-gray-3);
-  }
-
-  .error {
-    color: var(--sl-color-red);
-  }
-
-  @media (max-width: 480px) {
-    .admin-panel {
-      width: 100%;
-      right: -100%;
+  @media (max-width: 768px) {
+    .admin-trigger {
+      bottom: 72px;
+      right: 16px;
+      width: 44px;
+      height: 44px;
     }
   }
 </style>

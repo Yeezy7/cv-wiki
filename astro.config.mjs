@@ -10,6 +10,27 @@ export default defineConfig({
     starlight({
       title: 'AI Wiki',
       description: '面向 AI 学习、面试和工程实践的开源知识库',
+      locales: {
+        root: {
+          label: '简体中文',
+          lang: 'zh-CN',
+        },
+      },
+      components: {
+        Head: './src/components/Head.astro',
+        SiteTitle: './src/components/SiteTitle.astro',
+        MarkdownContent: './src/components/MarkdownContent.astro',
+      },
+      customCss: ['./src/styles/custom.css'],
+      editLink: {
+        baseUrl: 'https://github.com/Yeezy7/ai-wiki/edit/main',
+      },
+      lastUpdated: true,
+      pagination: true,
+      tableOfContents: {
+        minHeadingLevel: 2,
+        maxHeadingLevel: 3,
+      },
       social: [
         {
           icon: 'github',

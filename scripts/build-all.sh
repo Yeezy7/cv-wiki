@@ -2,9 +2,18 @@
 
 # 构建所有站点并合并输出
 
-set -e
+set -euo pipefail
 
 echo "开始构建所有站点..."
+
+echo "同步共享组件..."
+bash scripts/sync-shared.sh
+
+echo "运行工程校验..."
+npm run check
+
+echo "刷新内容索引..."
+npm run sync:content
 
 # 构建主站
 echo "构建主站..."
@@ -12,27 +21,19 @@ npm run build
 
 # 构建 CV 站点
 echo "构建 CV 站点..."
-cd sites/cv
-npm run build
-cd ../..
+npm run build:cv
 
 # 构建 LLM 站点
 echo "构建 LLM 站点..."
-cd sites/llm
-npm run build
-cd ../..
+npm run build:llm
 
 # 构建多模态站点
 echo "构建多模态站点..."
-cd sites/multimodal
-npm run build
-cd ../..
+npm run build:multimodal
 
 # 构建面试题库站点
 echo "构建面试题库站点..."
-cd sites/interview
-npm run build
-cd ../..
+npm run build:interview
 
 # 合并所有站点
 echo "合并所有站点..."

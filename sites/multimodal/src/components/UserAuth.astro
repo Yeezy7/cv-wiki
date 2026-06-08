@@ -1,175 +1,15 @@
 ---
+const repoUrl = 'https://github.com/Yeezy7/ai-wiki';
 ---
 
 <div class="user-auth" id="user-auth">
-  <!-- 未登录状态 -->
-  <div class="auth-logged-out" id="auth-logged-out">
-    <button id="github-login-btn" class="login-btn">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-      </svg>
-      使用 GitHub 登录
-    </button>
-  </div>
-
-  <!-- 已登录状态 -->
-  <div class="auth-logged-in" id="auth-logged-in" style="display: none;">
-    <div class="user-info">
-      <img id="user-avatar" class="user-avatar" src="" alt="用户头像" />
-      <span id="user-name" class="user-name"></span>
-      <button id="logout-btn" class="logout-btn" title="退出登录">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-          <polyline points="16 17 21 12 16 7"></polyline>
-          <line x1="21" y1="12" x2="9" y2="12"></line>
-        </svg>
-      </button>
-    </div>
-    <div class="user-role" id="user-role"></div>
-  </div>
+  <a href={repoUrl} class="github-link" aria-label="在 GitHub 查看 AI Wiki">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/>
+    </svg>
+    <span>GitHub 协作</span>
+  </a>
 </div>
-
-<script>
-  class UserAuth {
-    constructor() {
-      this.user = null;
-      this.init();
-    }
-
-    init() {
-      // 检查是否已登录
-      const savedUser = localStorage.getItem('user');
-      if (savedUser) {
-        this.user = JSON.parse(savedUser);
-        this.updateUI();
-      }
-
-      // 检查 URL 中是否有 code（GitHub OAuth 回调）
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
-      if (code) {
-        this.handleOAuthCallback(code);
-        // 清除 URL 中的 code
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-
-      // 绑定事件
-      document.getElementById('github-login-btn')?.addEventListener('click', () => this.login());
-      document.getElementById('logout-btn')?.addEventListener('click', () => this.logout());
-    }
-
-    login() {
-      // GitHub OAuth 配置
-      const clientId = localStorage.getItem('github-oauth-client-id') || '';
-      if (!clientId) {
-        // 如果没有配置 Client ID，显示配置提示
-        this.showConfigPrompt();
-        return;
-      }
-
-      const redirectUri = window.location.origin + window.location.pathname;
-      const scope = 'read:user user:email';
-      const state = Math.random().toString(36).substring(7);
-
-      // 保存 state 用于验证
-      localStorage.setItem('oauth-state', state);
-
-      // 重定向到 GitHub 授权页面
-      const authUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&state=${state}`;
-      window.location.href = authUrl;
-    }
-
-    showConfigPrompt() {
-      const clientId = prompt(
-        '请配置 GitHub OAuth Client ID：\n\n' +
-        '1. 访问 https://github.com/settings/developers\n' +
-        '2. 创建新的 OAuth App\n' +
-        '3. 获取 Client ID\n\n' +
-        '请输入 Client ID：'
-      );
-
-      if (clientId) {
-        localStorage.setItem('github-oauth-client-id', clientId);
-        this.login();
-      }
-    }
-
-    async handleOAuthCallback(code) {
-      // 注意：实际应用中，需要后端服务来交换 access_token
-      // 这里使用简化的实现，直接通过 GitHub API 获取用户信息
-      try {
-        // 由于浏览器安全限制，我们使用模拟的用户信息
-        // 实际应用中需要后端服务来完成 OAuth 流程
-        this.user = {
-          login: 'demo-user',
-          avatar_url: 'https://github.com/identicons/demo-user.png',
-          name: 'Demo User',
-          role: 'reader'
-        };
-
-        localStorage.setItem('user', JSON.stringify(this.user));
-        this.updateUI();
-      } catch (error) {
-        console.error('OAuth Error:', error);
-        alert('登录失败，请重试');
-      }
-    }
-
-    updateUI() {
-      const loggedOut = document.getElementById('auth-logged-out');
-      const loggedIn = document.getElementById('auth-logged-in');
-
-      if (this.user) {
-        loggedOut.style.display = 'none';
-        loggedIn.style.display = 'block';
-
-        const avatar = document.getElementById('user-avatar');
-        const name = document.getElementById('user-name');
-        const role = document.getElementById('user-role');
-
-        if (avatar) avatar.src = this.user.avatar_url;
-        if (name) name.textContent = this.user.login;
-        if (role) role.textContent = this.getRoleName(this.user.role);
-      } else {
-        loggedOut.style.display = 'block';
-        loggedIn.style.display = 'none';
-      }
-    }
-
-    getRoleName(role) {
-      const roles = {
-        'admin': '管理员',
-        'editor': '编辑者',
-        'reader': '读者'
-      };
-      return roles[role] || '读者';
-    }
-
-    logout() {
-      this.user = null;
-      localStorage.removeItem('user');
-      this.updateUI();
-    }
-
-    // 检查用户是否有特定权限
-    hasPermission(permission) {
-      if (!this.user) return false;
-
-      const permissions = {
-        'admin': ['read', 'write', 'delete', 'manage'],
-        'editor': ['read', 'write'],
-        'reader': ['read']
-      };
-
-      return permissions[this.user.role]?.includes(permission) || false;
-    }
-  }
-
-  // 初始化
-  document.addEventListener('DOMContentLoaded', () => {
-    window.userAuth = new UserAuth();
-  });
-</script>
 
 <style>
   .user-auth {
@@ -179,73 +19,29 @@
     z-index: 100;
   }
 
-  .login-btn {
-    display: flex;
+  .github-link {
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
+    gap: 0.45rem;
+    padding: 0.45rem 0.75rem;
     background: var(--sl-color-gray-6);
     color: var(--sl-color-white);
     border: 1px solid var(--sl-color-hairline);
     border-radius: 6px;
-    cursor: pointer;
     font-size: 0.85rem;
-    transition: background 0.2s;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s;
   }
 
-  .login-btn:hover {
+  .github-link:hover {
     background: var(--sl-color-gray-5);
-  }
-
-  .user-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    background: var(--sl-color-gray-6);
-    border: 1px solid var(--sl-color-hairline);
-    border-radius: 6px;
-  }
-
-  .user-avatar {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-  }
-
-  .user-name {
-    font-size: 0.85rem;
-    color: var(--sl-color-white);
-    max-width: 100px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .user-role {
-    font-size: 0.75rem;
-    color: var(--sl-color-gray-3);
-    text-align: center;
-    margin-top: 4px;
-  }
-
-  .logout-btn {
-    background: none;
-    border: none;
-    color: var(--sl-color-gray-3);
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
-    transition: color 0.2s;
-  }
-
-  .logout-btn:hover {
-    color: var(--sl-color-red);
+    border-color: var(--sl-color-text-accent);
   }
 
   @media (max-width: 768px) {
     .user-auth {
-      right: 120px;
+      display: none;
     }
   }
 </style>

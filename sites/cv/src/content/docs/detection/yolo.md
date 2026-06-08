@@ -1,6 +1,10 @@
 ---
 title: YOLO 系列
 description: 从 YOLOv1 到 YOLOv11，一文搞懂 YOLO 家族的核心思想与演进脉络
+category: cv
+tags: [yolo, object-detection]
+status: stable
+order: 2
 ---
 
 # YOLO 系列

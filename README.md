@@ -51,7 +51,53 @@ npm run build
 
 # 预览生产版本
 npm run preview
+
+# 同步共享组件到各子站
+npm run sync:shared
+
+# 强制刷新根站和子站内容索引
+npm run sync:content
+
+# 检查共享组件是否漂移，并校验文章 frontmatter 和内部链接
+npm run check
+
+# 构建主站与所有子站，并合并输出
+npm run build:all
 ```
+
+项目使用 npm workspaces 管理 `sites/*` 子站脚本。`npm run build:all` 会先同步共享组件、样式和中文翻译，再运行工程校验、刷新内容索引，最后构建主站及所有子站。
+
+共享组件以根站 `src/components/`、`src/styles/custom.css`、`src/content/i18n/zh-CN.json` 为来源。修改共享 UI 后先运行 `npm run sync:shared`，提交前运行 `npm run check`。
+
+## 可选配置
+
+评论区使用 Giscus，仅在普通文章页展示。未配置时文章页会显示“评论功能尚未启用”的说明，不会加载空配置脚本。
+
+```bash
+PUBLIC_GISCUS_REPO=Yeezy7/ai-wiki
+PUBLIC_GISCUS_REPO_ID=你的 Giscus repo id
+PUBLIC_GISCUS_CATEGORY=Announcements
+PUBLIC_GISCUS_CATEGORY_ID=你的 Giscus category id
+```
+
+AI 问答助手源码暂时保留，但当前不会在页面中渲染。后续如果要开启，建议先补后端代理或明确浏览器端密钥方案。
+
+## 内容规范
+
+所有文章必须包含以下 frontmatter 字段：
+
+```yaml
+title: 标题
+description: 一句话描述
+category: cv
+tags: [tag-a, tag-b]
+status: stable
+order: 1
+```
+
+`status` 只能使用 `draft`、`review`、`stable`。`npm run validate:content` 会检查根站和所有子站内容。
+
+内部链接建议使用带 `/ai-wiki` 前缀的站点绝对路径，或使用相对路径。`npm run validate:links` 会检查 Markdown/MDX 中的内部页面、静态资源和锚点链接。
 
 ## 技术栈
 

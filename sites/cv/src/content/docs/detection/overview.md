@@ -1,6 +1,10 @@
 ---
 title: 目标检测综述
 description: 从 R-CNN 到 DETR，全面理解目标检测的发展脉络与核心范式
+category: cv
+tags: [object-detection, overview]
+status: stable
+order: 1
 ---
 
 # 目标检测综述
@@ -122,7 +126,7 @@ Anchor-Free 方法摒弃了预定义锚框（Anchor Box）的设计。
 - **AP（Average Precision）**：单个类别的 PR 曲线下面积
 - **mAP（mean Average Precision）**：所有类别 AP 的平均值
 
-详见 [mAP 详解](/detection/map)。
+详见 [mAP 详解](../map/)。
 
 ## 面试标准回答
 

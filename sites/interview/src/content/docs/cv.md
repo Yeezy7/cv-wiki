@@ -4,6 +4,7 @@ description: 计算机视觉高频面试题和标准回答
 category: interview
 tags: [cv, interview]
 status: stable
+order: 1
 ---
 
 # CV 面试题

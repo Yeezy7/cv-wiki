@@ -1,6 +1,10 @@
 ---
 title: CNN 基础
 description: 卷积神经网络（Convolutional Neural Network）的核心概念与经典架构
+category: cv
+tags: [cnn, convolution, basics]
+status: stable
+order: 1
 ---
 
 # CNN 基础
