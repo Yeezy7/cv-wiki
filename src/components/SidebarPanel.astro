@@ -1,245 +1,464 @@
 ---
 ---
 
-<!-- 侧边栏收起/展开按钮 -->
-<button id="sidebar-toggle" class="sidebar-toggle" aria-label="收起侧边栏" title="收起侧边栏">
+<button
+  id="ai-left-collapse"
+  class="ai-sidebar-button ai-left-collapse"
+  aria-label="收起左侧目录"
+  aria-expanded="true"
+  aria-controls="starlight__sidebar"
+  title="收起左侧目录"
+>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
     <polyline points="11 17 6 12 11 7"></polyline>
     <polyline points="18 17 13 12 18 7"></polyline>
   </svg>
 </button>
 
-<!-- 侧边栏展开按钮（收起时显示） -->
-<button id="sidebar-expand" class="sidebar-expand" aria-label="展开侧边栏" title="展开侧边栏">
+<button
+  id="ai-left-expand"
+  class="ai-sidebar-button ai-sidebar-expand ai-left-expand"
+  aria-label="展开左侧目录"
+  aria-expanded="false"
+  aria-controls="starlight__sidebar"
+  title="展开左侧目录"
+>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
     <polyline points="13 17 18 12 13 7"></polyline>
     <polyline points="6 17 11 12 6 7"></polyline>
   </svg>
 </button>
 
-<!-- 侧边栏拖动条 -->
-<div id="sidebar-resizer" class="sidebar-resizer"></div>
+<div id="ai-left-resizer" class="ai-sidebar-resizer ai-left-resizer" aria-hidden="true"></div>
+
+<button
+  id="ai-right-collapse"
+  class="ai-sidebar-button ai-right-collapse"
+  aria-label="收起右侧目录"
+  aria-expanded="true"
+  aria-controls="ai-right-sidebar"
+  title="收起右侧目录"
+>
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <polyline points="13 17 18 12 13 7"></polyline>
+    <polyline points="6 17 11 12 6 7"></polyline>
+  </svg>
+</button>
+
+<button
+  id="ai-right-expand"
+  class="ai-sidebar-button ai-sidebar-expand ai-right-expand"
+  aria-label="展开右侧目录"
+  aria-expanded="false"
+  aria-controls="ai-right-sidebar"
+  title="展开右侧目录"
+>
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <polyline points="11 17 6 12 11 7"></polyline>
+    <polyline points="18 17 13 12 18 7"></polyline>
+  </svg>
+</button>
+
+<div id="ai-right-resizer" class="ai-sidebar-resizer ai-right-resizer" aria-hidden="true"></div>
 
 <script>
+  // 注意：sidebarSizing 配置与 Head.astro 中的值必须保持同步。
+  // Head.astro 用 is:inline 在绘制前执行防止 FOUC，这里在 DOMContentLoaded 后执行完整交互逻辑。
+  const sidebarSizing = {
+    leftMin: 220,
+    leftMax: 420,
+    leftDefault: 300,
+    leftCollapseAt: 168,
+    rightMin: 220,
+    rightMax: 360,
+    rightDefault: 280,
+    rightCollapseAt: 168,
+  };
+
+  const clampSidebarSize = (value: number, min: number, max: number) =>
+    Math.max(min, Math.min(max, value));
+
+  const readSidebarSize = (key: string, fallback: number, min: number, max: number) => {
+    const value = Number.parseInt(localStorage.getItem(key) || '', 10);
+    return Number.isFinite(value) ? clampSidebarSize(value, min, max) : fallback;
+  };
+
+  const restoreSidebarState = () => {
+    const root = document.documentElement;
+    root.classList.add('ai-sidebar-initializing');
+    root.style.setProperty(
+      '--sl-sidebar-width',
+      `${readSidebarSize(
+        'ai-left-sidebar-width',
+        sidebarSizing.leftDefault,
+        sidebarSizing.leftMin,
+        sidebarSizing.leftMax
+      )}px`
+    );
+    root.style.setProperty(
+      '--ai-toc-width',
+      `${readSidebarSize(
+        'ai-right-sidebar-width',
+        sidebarSizing.rightDefault,
+        sidebarSizing.rightMin,
+        sidebarSizing.rightMax
+      )}px`
+    );
+    root.classList.toggle(
+      'ai-left-collapsed',
+      localStorage.getItem('ai-left-sidebar-collapsed') === 'true'
+    );
+    root.classList.toggle(
+      'ai-right-collapsed',
+      localStorage.getItem('ai-right-sidebar-collapsed') === 'true'
+    );
+  };
+
+  restoreSidebarState();
+
   document.addEventListener('DOMContentLoaded', () => {
-    const sidebar = document.querySelector('#starlight__sidebar');
-    const mainPane = document.querySelector('.main-pane');
-    const toggleBtn = document.getElementById('sidebar-toggle');
-    const expandBtn = document.getElementById('sidebar-expand');
-    const resizer = document.getElementById('sidebar-resizer');
+    const root = document.documentElement;
+    const leftSidebar = document.querySelector<HTMLElement>('#starlight__sidebar');
+    const rightSidebar = document.querySelector<HTMLElement>('.right-sidebar');
+    const leftCollapse = document.getElementById('ai-left-collapse');
+    const leftExpand = document.getElementById('ai-left-expand');
+    const leftResizer = document.getElementById('ai-left-resizer');
+    const rightCollapse = document.getElementById('ai-right-collapse');
+    const rightExpand = document.getElementById('ai-right-expand');
+    const rightResizer = document.getElementById('ai-right-resizer');
 
-    if (!sidebar || !mainPane) return;
-
-    // 保存初始宽度
-    const savedWidth = localStorage.getItem('sidebar-width');
-    if (savedWidth) {
-      sidebar.style.width = savedWidth;
-      // 同步按钮位置
-      if (toggleBtn) toggleBtn.style.left = savedWidth;
-      if (resizer) resizer.style.left = savedWidth;
+    if (!leftSidebar) {
+      root.classList.remove('ai-sidebar-initializing');
+      return;
     }
 
-    // 收起/展开侧边栏
-    let isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+    const setLeftWidth = (width: number) => {
+      const nextWidth = clampSidebarSize(width, sidebarSizing.leftMin, sidebarSizing.leftMax);
+      root.style.setProperty('--sl-sidebar-width', `${nextWidth}px`);
+      localStorage.setItem('ai-left-sidebar-width', String(nextWidth));
+    };
 
-    function updateSidebarState() {
-      if (isCollapsed) {
-        sidebar.classList.add('collapsed');
-        mainPane.classList.add('sidebar-collapsed');
-        expandBtn?.classList.add('visible');
-        toggleBtn?.classList.add('hidden');
-        resizer?.classList.add('hidden');
-      } else {
-        sidebar.classList.remove('collapsed');
-        mainPane.classList.remove('sidebar-collapsed');
-        expandBtn?.classList.remove('visible');
-        toggleBtn?.classList.remove('hidden');
-        resizer?.classList.remove('hidden');
-      }
-      localStorage.setItem('sidebar-collapsed', String(isCollapsed));
+    const setRightWidth = (width: number) => {
+      const nextWidth = clampSidebarSize(width, sidebarSizing.rightMin, sidebarSizing.rightMax);
+      root.style.setProperty('--ai-toc-width', `${nextWidth}px`);
+      localStorage.setItem('ai-right-sidebar-width', String(nextWidth));
+    };
+
+    const setLeftCollapsed = (collapsed: boolean) => {
+      root.classList.toggle('ai-left-collapsed', collapsed);
+      leftCollapse?.setAttribute('aria-expanded', String(!collapsed));
+      leftExpand?.setAttribute('aria-expanded', String(!collapsed));
+      localStorage.setItem('ai-left-sidebar-collapsed', String(collapsed));
+    };
+
+    const setRightCollapsed = (collapsed: boolean) => {
+      root.classList.toggle('ai-right-collapsed', collapsed);
+      rightCollapse?.setAttribute('aria-expanded', String(!collapsed));
+      rightExpand?.setAttribute('aria-expanded', String(!collapsed));
+      localStorage.setItem('ai-right-sidebar-collapsed', String(collapsed));
+    };
+
+    setLeftWidth(
+      readSidebarSize(
+        'ai-left-sidebar-width',
+        sidebarSizing.leftDefault,
+        sidebarSizing.leftMin,
+        sidebarSizing.leftMax
+      )
+    );
+    setLeftCollapsed(localStorage.getItem('ai-left-sidebar-collapsed') === 'true');
+
+    if (rightSidebar) {
+      setRightWidth(
+        readSidebarSize(
+          'ai-right-sidebar-width',
+          sidebarSizing.rightDefault,
+          sidebarSizing.rightMin,
+          sidebarSizing.rightMax
+        )
+      );
+      setRightCollapsed(localStorage.getItem('ai-right-sidebar-collapsed') === 'true');
+    } else {
+      rightCollapse?.setAttribute('hidden', '');
+      rightExpand?.setAttribute('hidden', '');
+      rightResizer?.setAttribute('hidden', '');
     }
 
-    // 初始化状态
-    updateSidebarState();
+    const bindHoverTools = (
+      elements: Array<Element | null>,
+      className: string,
+      isCollapsed: () => boolean
+    ) => {
+      let hideTimer: number | undefined;
+      const show = () => {
+        if (hideTimer) window.clearTimeout(hideTimer);
+        if (!isCollapsed()) root.classList.add(className);
+      };
+      const hide = () => {
+        if (hideTimer) window.clearTimeout(hideTimer);
+        hideTimer = window.setTimeout(() => root.classList.remove(className), 180);
+      };
 
-    toggleBtn?.addEventListener('click', () => {
-      isCollapsed = true;
-      updateSidebarState();
-    });
+      elements.filter(Boolean).forEach((element) => {
+        element?.addEventListener('mouseenter', show);
+        element?.addEventListener('mouseleave', hide);
+        element?.addEventListener('focusin', show);
+        element?.addEventListener('focusout', hide);
+      });
+    };
 
-    expandBtn?.addEventListener('click', () => {
-      isCollapsed = false;
-      updateSidebarState();
-    });
+    bindHoverTools(
+      [leftSidebar, leftCollapse, leftResizer],
+      'ai-left-tools-visible',
+      () => root.classList.contains('ai-left-collapsed')
+    );
+    bindHoverTools(
+      [rightSidebar, rightCollapse, rightResizer],
+      'ai-right-tools-visible',
+      () => root.classList.contains('ai-right-collapsed') || !rightSidebar
+    );
 
-    // 拖动调整宽度
-    let isResizing = false;
-    let startX = 0;
-    let startWidth = 0;
+    leftCollapse?.addEventListener('click', () => setLeftCollapsed(true));
+    leftExpand?.addEventListener('click', () => setLeftCollapsed(false));
+    rightCollapse?.addEventListener('click', () => setRightCollapsed(true));
+    rightExpand?.addEventListener('click', () => setRightCollapsed(false));
 
-    resizer?.addEventListener('mousedown', (e) => {
-      isResizing = true;
-      startX = e.clientX;
-      startWidth = sidebar.offsetWidth;
-      document.body.style.cursor = 'col-resize';
+    let activeDrag:
+      | {
+          side: 'left' | 'right';
+          startX: number;
+          startWidth: number;
+        }
+      | undefined;
+
+    leftResizer?.addEventListener('mousedown', (event) => {
+      activeDrag = {
+        side: 'left',
+        startX: event.clientX,
+        startWidth: leftSidebar.getBoundingClientRect().width,
+      };
+      root.classList.add('ai-sidebar-dragging', 'ai-left-tools-visible');
       document.body.style.userSelect = 'none';
-      e.preventDefault();
+      event.preventDefault();
     });
 
-    document.addEventListener('mousemove', (e) => {
-      if (!isResizing) return;
+    rightResizer?.addEventListener('mousedown', (event) => {
+      if (!rightSidebar) return;
+      activeDrag = {
+        side: 'right',
+        startX: event.clientX,
+        startWidth: rightSidebar.getBoundingClientRect().width,
+      };
+      root.classList.add('ai-sidebar-dragging', 'ai-right-tools-visible');
+      document.body.style.userSelect = 'none';
+      event.preventDefault();
+    });
 
-      const diff = e.clientX - startX;
-      const newWidth = Math.max(200, Math.min(500, startWidth + diff));
-      sidebar.style.width = `${newWidth}px`;
-      // 同步按钮位置
-      if (toggleBtn) toggleBtn.style.left = `${newWidth}px`;
-      if (resizer) resizer.style.left = `${newWidth}px`;
+    document.addEventListener('mousemove', (event) => {
+      if (!activeDrag) return;
+
+      if (activeDrag.side === 'left') {
+        const nextWidth = activeDrag.startWidth + event.clientX - activeDrag.startX;
+        if (nextWidth <= sidebarSizing.leftCollapseAt) {
+          setLeftCollapsed(true);
+          return;
+        }
+        setLeftCollapsed(false);
+        setLeftWidth(nextWidth);
+      } else {
+        const nextWidth = activeDrag.startWidth - (event.clientX - activeDrag.startX);
+        if (nextWidth <= sidebarSizing.rightCollapseAt) {
+          setRightCollapsed(true);
+          return;
+        }
+        setRightCollapsed(false);
+        setRightWidth(nextWidth);
+      }
     });
 
     document.addEventListener('mouseup', () => {
-      if (isResizing) {
-        isResizing = false;
-        document.body.style.cursor = '';
-        document.body.style.userSelect = '';
-        localStorage.setItem('sidebar-width', sidebar.style.width);
-      }
+      if (!activeDrag) return;
+      activeDrag = undefined;
+      root.classList.remove('ai-sidebar-dragging');
+      document.body.style.userSelect = '';
     });
 
-    // 键盘快捷键
-    document.addEventListener('keydown', (e) => {
-      // Ctrl/Cmd + B 切换侧边栏
-      if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
-        e.preventDefault();
-        isCollapsed = !isCollapsed;
-        updateSidebarState();
-      }
+    requestAnimationFrame(() => {
+      root.classList.remove('ai-sidebar-initializing');
     });
   });
 </script>
 
 <style is:global>
-  /* 侧边栏收起按钮 */
-  .sidebar-toggle {
+  .ai-sidebar-button {
     position: fixed;
-    top: 70px;
-    left: 260px;
-    width: 24px;
-    height: 48px;
-    background: var(--sl-color-bg-nav);
-    border: 1px solid var(--sl-color-hairline);
-    border-left: none;
-    border-radius: 0 8px 8px 0;
-    cursor: pointer;
-    display: flex;
+    z-index: 32;
+    width: 2rem;
+    height: 2.25rem;
+    border: 1px solid color-mix(in srgb, var(--sl-color-hairline-light) 80%, transparent);
+    border-radius: 0.5rem;
+    background: color-mix(in srgb, var(--sl-color-bg-nav) 96%, var(--sl-color-bg-sidebar));
+    color: var(--sl-color-gray-2);
+    box-shadow:
+      0 10px 24px rgba(0, 0, 0, 0.14),
+      inset 0 1px 0 color-mix(in srgb, var(--sl-color-white) 7%, transparent);
+    display: none;
     align-items: center;
     justify-content: center;
-    color: var(--sl-color-gray-3);
-    z-index: 100;
-    transition: all 0.3s;
-  }
-
-  .sidebar-toggle:hover {
-    background: var(--sl-color-gray-6);
-    color: var(--sl-color-white);
-    width: 28px;
-  }
-
-  .sidebar-toggle.hidden {
+    cursor: pointer;
     opacity: 0;
     pointer-events: none;
+    transform: translateY(-1px) scale(0.96);
+    transition:
+      opacity 0.16s ease,
+      transform 0.16s ease,
+      color 0.16s ease,
+      border-color 0.16s ease,
+      background 0.16s ease;
   }
 
-  /* 侧边栏展开按钮 */
-  .sidebar-expand {
+  .ai-sidebar-button:hover,
+  .ai-sidebar-button:focus-visible {
+    color: var(--sl-color-white);
+    border-color: var(--sl-color-accent);
+    background: color-mix(in srgb, var(--sl-color-accent) 20%, var(--sl-color-gray-6));
+    outline: none;
+  }
+
+  .ai-sidebar-resizer {
     position: fixed;
-    top: 70px;
-    left: 0;
-    width: 32px;
-    height: 48px;
-    background: var(--sl-color-accent);
-    border: none;
-    border-radius: 0 8px 8px 0;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    z-index: 100;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
-  }
-
-  .sidebar-expand.visible {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .sidebar-expand:hover {
-    background: var(--sl-color-accent-high);
-    width: 36px;
-  }
-
-  /* 侧边栏拖动条 */
-  .sidebar-resizer {
-    position: fixed;
-    top: 0;
-    left: 260px;
-    width: 6px;
-    height: 100vh;
-    cursor: col-resize;
-    z-index: 99;
-    transition: background 0.2s;
-  }
-
-  .sidebar-resizer:hover {
-    background: var(--sl-color-accent);
-  }
-
-  .sidebar-resizer.hidden {
+    z-index: 31;
     display: none;
+    width: 10px;
+    cursor: col-resize;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.16s ease, background 0.16s ease;
   }
 
-  /* 侧边栏收起状态 */
-  #starlight__sidebar.collapsed {
-    transform: translateX(-100%);
-    width: 0 !important;
-    min-width: 0;
-    overflow: hidden;
-    border: none;
-    padding: 0;
+  .ai-sidebar-resizer::after {
+    content: '';
+    display: block;
+    width: 2px;
+    height: 100%;
+    margin-inline: auto;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--sl-color-hairline-light) 34%, transparent);
   }
 
-  .main-pane.sidebar-collapsed {
-    margin-left: 0 !important;
+  .ai-sidebar-resizer:hover::after,
+  .ai-sidebar-dragging .ai-sidebar-resizer::after {
+    background: var(--sl-color-accent);
   }
 
-  /* 侧边栏独立感 */
-  #starlight__sidebar {
-    border-right: 1px solid var(--sl-color-hairline);
-    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease, width 0.3s ease;
+  .ai-sidebar-initializing .ai-sidebar-button,
+  .ai-sidebar-initializing .ai-sidebar-resizer {
+    transition: none !important;
   }
 
-  /* 移动端适配 */
-  @media (max-width: 768px) {
-    .sidebar-toggle {
-      display: none;
+  @media (min-width: 50rem) {
+    :root {
+      --ai-left-panel-width: calc(var(--sl-sidebar-width) - (var(--ai-sidebar-gap) * 1.35));
+      --ai-right-panel-width: calc(var(--ai-toc-width) - var(--ai-sidebar-gap));
     }
 
-    .sidebar-expand {
-      top: auto;
-      bottom: 80px;
-      left: 12px;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
+    .ai-left-collapse {
+      display: flex;
+      top: calc(var(--sl-nav-height) + var(--ai-sidebar-gap) + 0.75rem);
+      left: calc(var(--ai-sidebar-gap) + var(--ai-left-panel-width) - 1rem);
     }
 
-    .sidebar-resizer {
-      display: none;
+    .ai-left-expand {
+      display: flex;
+      top: calc(var(--sl-nav-height) + var(--ai-sidebar-gap) + 0.75rem);
+      left: 0.5rem;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(-0.25rem);
+    }
+
+    .ai-left-resizer {
+      display: block;
+      top: calc(var(--sl-nav-height) + var(--ai-sidebar-gap));
+      bottom: var(--ai-sidebar-gap);
+      left: calc(var(--ai-sidebar-gap) + var(--ai-left-panel-width) - 0.35rem);
+    }
+
+    .ai-left-tools-visible .ai-left-collapse,
+    .ai-left-tools-visible .ai-left-resizer,
+    .ai-sidebar-dragging .ai-left-collapse,
+    .ai-sidebar-dragging .ai-left-resizer {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .ai-left-collapsed .ai-left-collapse,
+    .ai-left-collapsed .ai-left-resizer {
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+    }
+
+    .ai-left-collapsed .ai-left-expand {
+      opacity: 0.9;
+      pointer-events: auto;
+      visibility: visible;
+      transform: translateX(0);
+    }
+  }
+
+  @media (min-width: 72rem) {
+    .ai-right-collapse {
+      display: flex;
+      top: calc(var(--sl-nav-height) + var(--ai-sidebar-gap) + 0.75rem);
+      right: calc(var(--ai-sidebar-gap) + var(--ai-right-panel-width) - 1rem);
+    }
+
+    .ai-right-expand {
+      display: flex;
+      top: calc(var(--sl-nav-height) + var(--ai-sidebar-gap) + 0.75rem);
+      right: 0.5rem;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(0.25rem);
+    }
+
+    .ai-right-resizer {
+      display: block;
+      top: calc(var(--sl-nav-height) + var(--ai-sidebar-gap));
+      right: calc(var(--ai-sidebar-gap) + var(--ai-right-panel-width) - 0.35rem);
+      bottom: var(--ai-sidebar-gap);
+    }
+
+    .ai-right-tools-visible .ai-right-collapse,
+    .ai-right-tools-visible .ai-right-resizer,
+    .ai-sidebar-dragging .ai-right-collapse,
+    .ai-sidebar-dragging .ai-right-resizer {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .ai-right-collapsed .ai-right-collapse,
+    .ai-right-collapsed .ai-right-resizer {
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+    }
+
+    .ai-right-collapsed .ai-right-expand {
+      opacity: 0.9;
+      pointer-events: auto;
+      visibility: visible;
+      transform: translateX(0);
+    }
+  }
+
+  @media (max-width: 49.99rem) {
+    .ai-sidebar-button,
+    .ai-sidebar-resizer {
+      display: none !important;
     }
   }
 </style>

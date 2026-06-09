@@ -1,5 +1,7 @@
 ---
 import { Card, CardGrid } from '@astrojs/starlight/components';
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 ---
 
 <div class="landing">
@@ -13,19 +15,19 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
     <CardGrid>
       <Card title="计算机视觉" icon="star">
         <p>CNN、目标检测、图像分割、模型部署等核心知识</p>
-        <a href="/ai-wiki/cv/" class="card-link">进入学习 →</a>
+        <a href={`${base}cv/`} class="card-link">进入学习 →</a>
       </Card>
       <Card title="大语言模型" icon="open-book">
         <p>Transformer、RAG、Fine-tuning、RLHF 等核心技术</p>
-        <a href="/ai-wiki/llm/" class="card-link">进入学习 →</a>
+        <a href={`${base}llm/`} class="card-link">进入学习 →</a>
       </Card>
       <Card title="多模态" icon="puzzle">
         <p>CLIP、ViT、Grounding 等前沿技术</p>
-        <a href="/ai-wiki/multimodal/" class="card-link">进入学习 →</a>
+        <a href={`${base}multimodal/`} class="card-link">进入学习 →</a>
       </Card>
       <Card title="面试题库" icon="document">
         <p>按领域整理的高频面试题和标准回答</p>
-        <a href="/ai-wiki/interview/cv" class="card-link">开始复习 →</a>
+        <a href={`${base}interview/cv`} class="card-link">开始复习 →</a>
       </Card>
     </CardGrid>
   </div>
@@ -124,7 +126,7 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
     color: var(--sl-color-gray-2);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 49.99rem) {
     .hero h1 {
       font-size: 2rem;
     }

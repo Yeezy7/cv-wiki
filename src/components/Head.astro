@@ -1,7 +1,76 @@
 ---
 import Default from '@astrojs/starlight/components/Head.astro';
 import SEOHead from './SEOHead.astro';
+
+const { starlightRoute } = Astro.locals;
+const entryId = starlightRoute.id ?? starlightRoute.entry.id;
+const frontmatter = starlightRoute.entry.data as { template?: string };
+const isNotFoundPage = entryId === '404' || entryId.endsWith('/404');
+const shouldInitSidebarState =
+  starlightRoute.hasSidebar && frontmatter.template !== 'splash' && !isNotFoundPage;
+
+// 注意：sidebarSizing 配置与 SidebarPanel.astro 中的值必须保持同步。
+// 这里用 is:inline 在绘制前执行，防止侧边栏宽度闪烁（FOUC）；
+// SidebarPanel.astro 在 DOMContentLoaded 后执行完整的交互逻辑。
 ---
+
+{
+  shouldInitSidebarState && (
+    <script is:inline>
+      (() => {
+        const sidebarSizing = {
+          leftMin: 220,
+          leftMax: 420,
+          leftDefault: 300,
+          rightMin: 220,
+          rightMax: 360,
+          rightDefault: 280,
+        };
+        const root = document.documentElement;
+        const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+        const readStoredValue = (key) => {
+          try {
+            return localStorage.getItem(key);
+          } catch {
+            return null;
+          }
+        };
+        const readSize = (key, fallback, min, max) => {
+          const value = Number.parseInt(readStoredValue(key) || '', 10);
+          return Number.isFinite(value) ? clamp(value, min, max) : fallback;
+        };
+
+        root.classList.add('ai-sidebar-initializing');
+        root.style.setProperty(
+          '--sl-sidebar-width',
+          readSize(
+            'ai-left-sidebar-width',
+            sidebarSizing.leftDefault,
+            sidebarSizing.leftMin,
+            sidebarSizing.leftMax
+          ) + 'px'
+        );
+        root.style.setProperty(
+          '--ai-toc-width',
+          readSize(
+            'ai-right-sidebar-width',
+            sidebarSizing.rightDefault,
+            sidebarSizing.rightMin,
+            sidebarSizing.rightMax
+          ) + 'px'
+        );
+        root.classList.toggle(
+          'ai-left-collapsed',
+          readStoredValue('ai-left-sidebar-collapsed') === 'true'
+        );
+        root.classList.toggle(
+          'ai-right-collapsed',
+          readStoredValue('ai-right-sidebar-collapsed') === 'true'
+        );
+      })();
+    </script>
+  )
+}
 
 <Default />
 <SEOHead />

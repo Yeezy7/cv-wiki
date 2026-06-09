@@ -1,0 +1,40 @@
+---
+import MobileMenuFooter from 'virtual:starlight/components/MobileMenuFooter';
+import SidebarPersister from '@astrojs/starlight/components/SidebarPersister.astro';
+import SidebarSublist from '@astrojs/starlight/components/SidebarSublist.astro';
+
+const { sidebar, id } = Astro.locals.starlightRoute;
+
+const sectionLabels = {
+  guide: '学习指南',
+  cv: '计算机视觉',
+  llm: '大语言模型',
+  multimodal: '多模态',
+  interview: '面试题库',
+} as const;
+
+type Section = keyof typeof sectionLabels;
+
+function getSection(entryId: string): Section {
+  if (entryId === 'cv' || entryId.startsWith('cv/')) return 'cv';
+  if (entryId === 'llm' || entryId.startsWith('llm/')) return 'llm';
+  if (entryId === 'multimodal' || entryId.startsWith('multimodal/')) return 'multimodal';
+  if (entryId === 'interview' || entryId.startsWith('interview/')) return 'interview';
+
+  return 'guide';
+}
+
+const currentSection = getSection(id ?? '');
+const scopedSidebar = sidebar.filter(
+  (entry) => entry.type === 'group' && entry.label === sectionLabels[currentSection]
+);
+const visibleSidebar = scopedSidebar.length > 0 ? scopedSidebar : sidebar;
+---
+
+<SidebarPersister>
+  <SidebarSublist sublist={visibleSidebar} />
+</SidebarPersister>
+
+<div class="md:sl-hidden">
+  <MobileMenuFooter />
+</div>

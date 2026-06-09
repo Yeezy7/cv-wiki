@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://Yeezy7.github.io/ai-wiki/sitemap-index.xml

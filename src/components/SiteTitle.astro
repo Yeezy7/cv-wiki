@@ -1,6 +1,9 @@
 ---
+import { rootBase } from '../starlight-shared.mjs';
+
 const { siteTitle, siteTitleHref } = Astro.locals.starlightRoute;
 const isHomeSite = siteTitle === 'AI Wiki';
+const homeHref = rootBase;
 ---
 
 <div class="site-title-group">
@@ -10,7 +13,7 @@ const isHomeSite = siteTitle === 'AI Wiki';
   {!isHomeSite && (
     <>
       <span class="separator">|</span>
-      <a href="/ai-wiki/" class="site-title-link home-link">AI Wiki 首页</a>
+      <a href={homeHref} class="site-title-link home-link">AI Wiki 首页</a>
     </>
   )}
 </div>

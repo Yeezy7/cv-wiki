@@ -30,15 +30,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install site dependencies
-        run: |
-          cd sites/cv && npm ci && cd ../..
-          cd sites/llm && npm ci && cd ../..
-          cd sites/multimodal && npm ci && cd ../..
-          cd sites/interview && npm ci && cd ../..
-
       - name: Build all sites
-        run: ./scripts/build-all.sh
+        run: npm run build:all
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

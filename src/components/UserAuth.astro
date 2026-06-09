@@ -13,33 +13,39 @@ const repoUrl = 'https://github.com/Yeezy7/ai-wiki';
 
 <style>
   .user-auth {
-    position: fixed;
-    top: 12px;
-    right: 200px;
-    z-index: 100;
+    display: flex;
+    justify-content: flex-end;
+    margin: 1.5rem 0 0;
   }
 
   .github-link {
     display: inline-flex;
     align-items: center;
-    gap: 0.45rem;
-    padding: 0.45rem 0.75rem;
-    background: var(--sl-color-gray-6);
-    color: var(--sl-color-white);
-    border: 1px solid var(--sl-color-hairline);
-    border-radius: 6px;
-    font-size: 0.85rem;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: color-mix(in srgb, var(--sl-color-gray-6) 84%, transparent);
+    color: var(--sl-color-gray-1);
+    border: 1px solid color-mix(in srgb, var(--sl-color-hairline-light) 78%, transparent);
+    border-radius: 999px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+    font-size: 0.82rem;
     font-weight: 600;
     text-decoration: none;
-    transition: background 0.2s, border-color 0.2s;
+    transition:
+      background 0.2s,
+      border-color 0.2s,
+      color 0.2s,
+      transform 0.2s;
   }
 
   .github-link:hover {
-    background: var(--sl-color-gray-5);
+    background: color-mix(in srgb, var(--sl-color-gray-5) 88%, transparent);
     border-color: var(--sl-color-text-accent);
+    color: var(--sl-color-white);
+    transform: translateY(-1px);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 49.99rem) {
     .user-auth {
       display: none;
     }

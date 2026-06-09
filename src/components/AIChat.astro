@@ -4,7 +4,7 @@
 <div class="ai-chat-container collapsed" id="ai-chat-container">
   <div class="ai-chat-header">
     <h3>AI 问答助手</h3>
-    <button id="toggle-chat" class="toggle-btn collapsed" aria-label="展开/收起">
+    <button id="toggle-chat" class="toggle-btn collapsed" aria-label="展开/收起" aria-expanded="false" aria-controls="chat-body">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <polyline points="6 9 12 15 18 9"></polyline>
       </svg>
@@ -12,7 +12,7 @@
   </div>
 
   <div class="ai-chat-body collapsed" id="chat-body">
-    <div class="ai-chat-messages" id="chat-messages">
+    <div class="ai-chat-messages" id="chat-messages" role="log" aria-live="polite">
       <div class="message ai-message">
         <div class="message-content">
           你好！我是 AI 问答助手。你可以问我关于当前页面内容的问题。
@@ -21,6 +21,7 @@
     </div>
 
     <div class="ai-chat-input">
+      <label for="chat-input" class="sr-only">输入你的问题</label>
       <textarea
         id="chat-input"
         placeholder="输入你的问题..."
@@ -101,10 +102,12 @@
         const container = document.getElementById('ai-chat-container');
         const body = document.getElementById('chat-body');
         const btn = document.getElementById('toggle-chat');
+        const isOpen = !body?.classList.contains('collapsed');
         container?.classList.toggle('collapsed');
         body?.classList.toggle('collapsed');
         btn?.classList.toggle('collapsed');
-        localStorage.setItem('ai-chat-open', String(!body?.classList.contains('collapsed')));
+        btn?.setAttribute('aria-expanded', String(isOpen));
+        localStorage.setItem('ai-chat-open', String(isOpen));
       });
 
       // 发送消息
@@ -213,7 +216,8 @@
         this.addMessage('ai', aiMessage);
       } catch (error) {
         console.error('AI Chat Error:', error);
-        this.addMessage('ai', `错误：${error.message}`);
+        const msg = error instanceof Error ? error.message : String(error);
+        this.addMessage('ai', `错误：${msg}`);
       } finally {
         this.isLoading = false;
         this.updateSendButton();
@@ -303,21 +307,19 @@
     transition: background 0.2s;
   }
 
-  .toggle-btn:hover {
+  .toggle-btn:hover,
+  .toggle-btn:focus-visible {
     background: rgba(255, 255, 255, 0.2);
+    outline: none;
   }
 
   .toggle-btn svg {
-    transform: rotate(180deg);
+    transform: rotate(0deg);
     transition: transform 0.2s;
   }
 
   .toggle-btn.collapsed svg {
     transform: rotate(180deg);
-  }
-
-  .toggle-btn:not(.collapsed) svg {
-    transform: rotate(0deg);
   }
 
   .ai-chat-body {
@@ -404,7 +406,8 @@
     transition: background 0.2s;
   }
 
-  .send-btn:hover:not(:disabled) {
+  .send-btn:hover:not(:disabled),
+  .send-btn:focus-visible {
     background: var(--sl-color-accent-high);
   }
 
@@ -472,11 +475,24 @@
     font-size: 0.85rem;
   }
 
-  .save-btn:hover {
+  .save-btn:hover,
+  .save-btn:focus-visible {
     background: var(--sl-color-accent-high);
   }
 
-  @media (max-width: 480px) {
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (max-width: 30rem) {
     .ai-chat-container {
       width: calc(100% - 40px);
       bottom: 10px;

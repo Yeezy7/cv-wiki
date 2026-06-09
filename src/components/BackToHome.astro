@@ -1,7 +1,10 @@
 ---
+import { rootBase } from '../starlight-shared.mjs';
+
+const homeHref = rootBase;
 ---
 
-<a href="/ai-wiki/" class="back-to-home">
+<a href={homeHref} class="back-to-home">
   ← 返回 AI Wiki 主页
 </a>
 

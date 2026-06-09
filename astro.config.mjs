@@ -1,44 +1,31 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import { sharedStarlightOpts, sharedSocial } from './src/starlight-shared.mjs';
 
-// https://astro.build/config
 export default defineConfig({
   site: 'https://Yeezy7.github.io',
   base: '/ai-wiki',
   integrations: [
-    // 首页站点
     starlight({
+      ...sharedStarlightOpts(''),
       title: 'AI Wiki',
       description: '面向 AI 学习、面试和工程实践的开源知识库',
-      locales: {
-        root: {
-          label: '简体中文',
-          lang: 'zh-CN',
-        },
-      },
+      editLink: { baseUrl: 'https://github.com/Yeezy7/ai-wiki/edit/main' },
       components: {
         Head: './src/components/Head.astro',
         SiteTitle: './src/components/SiteTitle.astro',
+        Sidebar: './src/components/Sidebar.astro',
         MarkdownContent: './src/components/MarkdownContent.astro',
       },
-      customCss: ['./src/styles/custom.css'],
-      editLink: {
-        baseUrl: 'https://github.com/Yeezy7/ai-wiki/edit/main',
-      },
-      lastUpdated: true,
-      pagination: true,
-      tableOfContents: {
-        minHeadingLevel: 2,
-        maxHeadingLevel: 3,
-      },
-      social: [
-        {
-          icon: 'github',
-          label: 'GitHub',
-          href: 'https://github.com/Yeezy7/ai-wiki',
-        },
-      ],
       sidebar: [
+        {
+          label: '学习指南',
+          items: [
+            { label: '项目介绍', slug: 'index' },
+            { label: '学习路线', slug: 'guide/roadmap' },
+            { label: '如何使用', slug: 'guide/how-to-use' },
+          ],
+        },
         {
           label: '计算机视觉',
           items: [
@@ -89,6 +76,7 @@ export default defineConfig({
         {
           label: '面试题库',
           items: [
+            { label: '概述', slug: 'interview' },
             { label: 'CV 面试题', slug: 'interview/cv' },
           ],
         },

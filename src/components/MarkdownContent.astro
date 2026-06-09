@@ -4,8 +4,8 @@ import CommentsWrapper from './CommentsWrapper.astro';
 import AdminPanel from './AdminPanel.astro';
 import UserAuth from './UserAuth.astro';
 import BackToTop from './BackToTop.astro';
-import TableOfContentsHighlight from './TableOfContentsHighlight.astro';
-import SearchEnhance from './SearchEnhance.astro';
+
+
 import SidebarPanel from './SidebarPanel.astro';
 
 const { ...props } = Astro.props;
@@ -15,24 +15,34 @@ const entryPath = starlightRoute.entry.filePath ?? '';
 const frontmatter = starlightRoute.entry.data as { category?: string; template?: string };
 const isIndexPage =
   entryId === '' || entryPath.endsWith('/index.md') || entryPath.endsWith('/index.mdx');
+const isGuidePage =
+  entryId === 'guide' || entryId.startsWith('guide/') || entryPath.includes('/guide/');
+const isNotFoundPage = entryId === '404' || entryId.endsWith('/404');
 const isOverviewPage =
   isIndexPage ||
+  isGuidePage ||
   entryId.endsWith('/overview') ||
-  entryId === '404' ||
-  entryId.endsWith('/404') ||
+  isNotFoundPage ||
   frontmatter.category === 'guide' ||
   frontmatter.template === 'splash';
 const showArticleEnhancements = !isOverviewPage;
+const showSidebarControls = starlightRoute.hasSidebar && frontmatter.template !== 'splash' && !isNotFoundPage;
 ---
 
 <Default {...props}>
   <slot />
 </Default>
 
-<SidebarPanel />
-<UserAuth />
-{showArticleEnhancements && <CommentsWrapper />}
-{showArticleEnhancements && <AdminPanel />}
-<BackToTop />
-<TableOfContentsHighlight />
-<SearchEnhance />
+{showSidebarControls && <SidebarPanel />}
+
+{
+  showArticleEnhancements && (
+    <>
+      <UserAuth />
+      <CommentsWrapper />
+      <AdminPanel />
+      <BackToTop />
+
+    </>
+  )
+}

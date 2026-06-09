@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 同步或检查根站共享文件到各子站，避免多站实现漂移。
+# 将根站共享组件以符号链接形式挂载到各子站，消除文件复制和同步漂移。
 
 set -euo pipefail
 
@@ -18,10 +18,8 @@ COMPONENTS=(
   "LazyImage.astro"
   "MarkdownContent.astro"
   "SEOHead.astro"
-  "SearchEnhance.astro"
   "SidebarPanel.astro"
   "SiteTitle.astro"
-  "TableOfContentsHighlight.astro"
   "UserAuth.astro"
 )
 
@@ -30,18 +28,25 @@ if [[ "$MODE" != "sync" && "$MODE" != "--check" ]]; then
   exit 1
 fi
 
-check_file() {
-  local source_file="$1"
-  local target_file="$2"
+# 确保符号链接指向正确目标；--check 模式下仅报告不修复。
+check_or_link() {
+  local target_file="$1"
+  local link_target="$2"
 
-  if [[ ! -f "$target_file" ]]; then
-    echo "缺少共享文件：$target_file" >&2
-    return 1
-  fi
-
-  if ! cmp -s "$source_file" "$target_file"; then
-    echo "共享文件未同步：$target_file" >&2
-    return 1
+  if [[ "$MODE" == "--check" ]]; then
+    if [[ ! -L "$target_file" ]]; then
+      echo "缺少符号链接：$target_file" >&2
+      return 1
+    fi
+    local actual
+    actual="$(readlink "$target_file")"
+    if [[ "$actual" != "$link_target" ]]; then
+      echo "符号链接指向错误：$target_file -> $actual（期望 $link_target）" >&2
+      return 1
+    fi
+  else
+    rm -f "$target_file"
+    ln -s "$link_target" "$target_file"
   fi
 }
 
@@ -57,23 +62,11 @@ for site in "${SITES[@]}"; do
   fi
 
   for component in "${COMPONENTS[@]}"; do
-    source_file="$ROOT_DIR/src/components/$component"
-    target_file="$component_target/$component"
-
-    if [[ "$MODE" == "--check" ]]; then
-      check_file "$source_file" "$target_file" || has_drift=1
-    else
-      cp "$source_file" "$target_file"
-    fi
+    check_or_link "$component_target/$component" "../../../../src/components/$component" || has_drift=1
   done
 
-  if [[ "$MODE" == "--check" ]]; then
-    check_file "$ROOT_DIR/src/styles/custom.css" "$style_target/custom.css" || has_drift=1
-    check_file "$ROOT_DIR/src/content/i18n/zh-CN.json" "$i18n_target/zh-CN.json" || has_drift=1
-  else
-    cp "$ROOT_DIR/src/styles/custom.css" "$style_target/custom.css"
-    cp "$ROOT_DIR/src/content/i18n/zh-CN.json" "$i18n_target/zh-CN.json"
-  fi
+  check_or_link "$style_target/custom.css" "../../../../src/styles/custom.css" || has_drift=1
+  check_or_link "$i18n_target/zh-CN.json" "../../../../../src/content/i18n/zh-CN.json" || has_drift=1
 done
 
 if [[ "$MODE" == "--check" ]]; then
@@ -84,5 +77,5 @@ if [[ "$MODE" == "--check" ]]; then
 
   echo "共享文件检查通过。"
 else
-  echo "共享组件、样式和中文翻译已同步到子站。"
+  echo "共享组件、样式和中文翻译已通过符号链接挂载到子站。"
 fi

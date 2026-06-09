@@ -3,19 +3,31 @@ const { entry, siteTitle } = Astro.locals.starlightRoute;
 const title = entry?.data?.title ?? siteTitle;
 const description = entry?.data?.description ?? '面向 AI 学习、面试和工程实践的开源知识库';
 const siteName = siteTitle ?? 'AI Wiki';
-const keywords = [
-  'AI',
-  '人工智能',
-  '机器学习',
-  '深度学习',
-  '计算机视觉',
-  '大语言模型',
-  '多模态',
-  '面试',
-].join(', ');
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+const tags: string[] = entry?.data?.tags ?? [];
+const keywords = tags.length > 0
+  ? tags.join(', ')
+  : ['AI', '人工智能', '机器学习', '深度学习', '计算机视觉', '大语言模型', '多模态', '面试'].join(', ');
+const ogTitle = title === siteName ? title : `${title} – ${siteName}`;
 ---
 
-<!-- Extra SEO metadata -->
+<!-- Canonical -->
+<link rel="canonical" href={canonicalUrl} />
+
+<!-- Open Graph -->
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content={siteName} />
+<meta property="og:title" content={ogTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:locale" content="zh_CN" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content={ogTitle} />
+<meta name="twitter:description" content={description} />
+
+<!-- SEO -->
 <meta name="keywords" content={keywords} />
 <meta name="author" content="AI Wiki" />
 
@@ -25,12 +37,14 @@ const keywords = [
   "@type": "TechArticle",
   "headline": title,
   "name": siteName,
-  "url": Astro.url,
+  "url": canonicalUrl.href,
   "description": description,
   "inLanguage": "zh-CN",
+  "author": { "@type": "Organization", "name": "AI Wiki" },
+  "publisher": { "@type": "Organization", "name": "AI Wiki" },
   "isPartOf": {
     "@type": "WebSite",
     "name": "AI Wiki",
-    "url": Astro.site,
+    "url": Astro.site?.href,
   },
 })} />

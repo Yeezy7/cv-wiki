@@ -1,42 +1,22 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import { sharedStarlightOpts } from '../../src/starlight-shared.mjs';
 
 export default defineConfig({
   site: 'https://Yeezy7.github.io',
   base: '/ai-wiki/cv',
   integrations: [
     starlight({
+      ...sharedStarlightOpts('cv'),
       title: 'CV Wiki',
       description: '计算机视觉知识库',
-      locales: {
-        root: {
-          label: '简体中文',
-          lang: 'zh-CN',
-        },
-      },
-      components: {
-        Head: './src/components/Head.astro',
-        SiteTitle: './src/components/SiteTitle.astro',
-        MarkdownContent: './src/components/MarkdownContent.astro',
-      },
-      customCss: ['./src/styles/custom.css'],
-      editLink: {
-        baseUrl: 'https://github.com/Yeezy7/ai-wiki/edit/main/sites/cv',
-      },
-      lastUpdated: true,
-      pagination: true,
-      tableOfContents: {
-        minHeadingLevel: 2,
-        maxHeadingLevel: 3,
-      },
-      social: [
-        {
-          icon: 'github',
-          label: 'GitHub',
-          href: 'https://github.com/Yeezy7/ai-wiki',
-        },
-      ],
       sidebar: [
+        {
+          label: '开始',
+          items: [
+            { label: '领域概述与学习路线', slug: 'index' },
+          ],
+        },
         {
           label: '深度学习基础',
           items: [
