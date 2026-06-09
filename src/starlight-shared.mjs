@@ -1,7 +1,16 @@
 // 各站共享的 Starlight 配置。各站 astro.config.mjs 导入后用 spread 覆盖差异化字段。
 
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+
 /** 根站 base 路径，用于子站返回首页等场景 */
 export const rootBase = '/ai-wiki/';
+
+/** 各站共享的 markdown 渲染配置（数学公式） */
+export const sharedMarkdown = {
+  remarkPlugins: [remarkMath],
+  rehypePlugins: [rehypeKatex],
+};
 
 export const sharedLocales = {
   root: {
@@ -37,11 +46,16 @@ export function sharedStarlightOpts(siteDir) {
   return {
     locales: sharedLocales,
     components: sharedComponents,
-    customCss: ['./src/styles/custom.css'],
+    customCss: ['katex/dist/katex.min.css', './src/styles/custom.css'],
     editLink: { baseUrl: editBaseUrl(siteDir) },
     lastUpdated: true,
     pagination: false,
     tableOfContents: { minHeadingLevel: 2, maxHeadingLevel: 3 },
     social: sharedSocial,
+    expressiveCode: {
+      frames: {
+        showLanguage: true,
+      },
+    },
   };
 }

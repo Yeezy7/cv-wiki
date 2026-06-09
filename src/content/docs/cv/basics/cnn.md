@@ -93,7 +93,9 @@ CNN 的核心思想可以概括为三个字：**局部性**、**平移不变性*
 
 计算公式（逐层递推）：
 
-$$RF_l = RF_{l-1} + (k_l - 1) \times \prod_{i=1}^{l-1} s_i$$
+$$
+RF_l = RF_{l-1} + (k_l - 1) \times \prod_{i=1}^{l-1} s_i
+$$
 
 其中：
 - $RF_l$ 是第 $l$ 层的感受野大小
@@ -108,7 +110,9 @@ $$RF_l = RF_{l-1} + (k_l - 1) \times \prod_{i=1}^{l-1} s_i$$
 
 对于输入特征图 $X \in \mathbb{R}^{H \times W}$ 和卷积核 $K \in \mathbb{R}^{k_h \times k_w}$，输出特征图 $Y$ 的第 $(i, j)$ 个元素为：
 
-$$Y(i, j) = \sum_{m=0}^{k_h-1} \sum_{n=0}^{k_w-1} X(i+m, j+n) \cdot K(m, n) + b$$
+$$ 
+Y(i, j) = \sum_{m=0}^{k_h-1} \sum_{n=0}^{k_w-1} X(i+m, j+n) \cdot K(m, n) + b
+$$
 
 其中：
 - $H, W$ 是输入的高度和宽度
@@ -119,7 +123,9 @@ $$Y(i, j) = \sum_{m=0}^{k_h-1} \sum_{n=0}^{k_w-1} X(i+m, j+n) \cdot K(m, n) + b$
 
 实际中输入通常有 $C_{in}$ 个通道，卷积核也有 $C_{in}$ 个通道。一个卷积核的完整计算为：
 
-$$Y(i, j) = \sum_{c=0}^{C_{in}-1} \sum_{m=0}^{k_h-1} \sum_{n=0}^{k_w-1} X_c(i+m, j+n) \cdot K_c(m, n) + b$$
+$$ 
+Y(i, j) = \sum_{c=0}^{C_{in}-1} \sum_{m=0}^{k_h-1} \sum_{n=0}^{k_w-1} X_c(i+m, j+n) \cdot K_c(m, n) + b
+$$
 
 若使用 $C_{out}$ 个不同的卷积核，则输出特征图有 $C_{out}$ 个通道。
 
@@ -127,7 +133,9 @@ $$Y(i, j) = \sum_{c=0}^{C_{in}-1} \sum_{m=0}^{k_h-1} \sum_{n=0}^{k_w-1} X_c(i+m,
 
 给定输入尺寸 $H_{in}$、卷积核大小 $k$、步长 $s$、填充 $p$，输出尺寸为：
 
-$$H_{out} = \left\lfloor \frac{H_{in} + 2p - k}{s} \right\rfloor + 1$$
+$$ 
+H_{out} = \left\lfloor \frac{H_{in} + 2p - k}{s} \right\rfloor + 1
+$$
 
 ## 代码示例
 

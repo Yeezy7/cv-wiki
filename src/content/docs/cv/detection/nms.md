@@ -33,7 +33,9 @@ order: 3
 
 ### IoU（Intersection over Union，交并比）
 
-$$IoU = \frac{|A \cap B|}{|A \cup B|} = \frac{\text{交集面积}}{\text{并集面积}}$$
+$$ 
+IoU = \frac{|A \cap B|}{|A \cup B|} = \frac{\text{交集面积}}{\text{并集面积}}
+$$
 
 其中：
 - $A$、$B$ 分别表示两个边界框
@@ -45,11 +47,17 @@ $$IoU = \frac{|A \cap B|}{|A \cup B|} = \frac{\text{交集面积}}{\text{并集�
 
 给定两个框 $B_1 = (x_1, y_1, x_2, y_2)$ 和 $B_2 = (x_1', y_1', x_2', y_2')$：
 
-$$x_{inter} = \max(0, \min(x_2, x_2') - \max(x_1, x_1'))$$
+$$ 
+x_{inter} = \max(0, \min(x_2, x_2') - \max(x_1, x_1'))
+$$
 
-$$y_{inter} = \max(0, \min(y_2, y_2') - \max(y_1, y_1'))$$
+$$ 
+y_{inter} = \max(0, \min(y_2, y_2') - \max(y_1, y_1'))
+$$
 
-$$\text{交集面积} = x_{inter} \times y_{inter}$$
+$$ 
+\text{交集面积} = x_{inter} \times y_{inter}
+$$
 
 取 $\max(0, \cdot)$ 是因为当两个框不重叠时，交集面积为 0。
 

@@ -36,9 +36,13 @@ order: 4
 
 ### Precision 和 Recall
 
-$$Precision = \frac{TP}{TP + FP} = \frac{\text{正确检测数}}{\text{所有检测数}}$$
+$$ 
+Precision = \frac{TP}{TP + FP} = \frac{\text{正确检测数}}{\text{所有检测数}}
+$$
 
-$$Recall = \frac{TP}{TP + FN} = \frac{正确检测数}{\text{所有真值框数}}$$
+$$ 
+Recall = \frac{TP}{TP + FN} = \frac{正确检测数}{\text{所有真值框数}}
+$$
 
 其中：
 - $TP$ 是 IoU 达到阈值的检测框数量
@@ -55,19 +59,25 @@ $$Recall = \frac{TP}{TP + FN} = \frac{正确检测数}{\text{所有真值框数}
 
 在 Recall = 0, 0.1, 0.2, ..., 1.0 这 11 个点上取 Precision 的最大值，然后求平均：
 
-$$AP = \frac{1}{11} \sum_{r \in \{0, 0.1, ..., 1.0\}} \max_{\tilde{r} \geq r} p(\tilde{r})$$
+$$ 
+AP = \frac{1}{11} \sum_{r \in \{0, 0.1, ..., 1.0\}} \max_{\tilde{r} \geq r} p(\tilde{r})
+$$
 
 **所有点插值法（PASCAL VOC 2010+ / COCO）**
 
 在每个 Recall 变化点上取 Precision 的最大值，然后计算面积：
 
-$$AP = \sum_{n} (r_{n+1} - r_n) \cdot p_{\text{interp}}(r_{n+1})$$
+$$ 
+AP = \sum_{n} (r_{n+1} - r_n) \cdot p_{\text{interp}}(r_{n+1})
+$$
 
 其中 $p_{\text{interp}}(r) = \max_{\tilde{r} \geq r} p(\tilde{r})$，即在 Recall 大于等于 $r$ 的所有点中取最大的 Precision。
 
 ### mAP
 
-$$mAP = \frac{1}{C} \sum_{c=1}^{C} AP_c$$
+$$ 
+mAP = \frac{1}{C} \sum_{c=1}^{C} AP_c
+$$
 
 其中：
 - $C$ 是类别总数

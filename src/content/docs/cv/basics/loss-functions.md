@@ -59,20 +59,26 @@ order: 4
 
 #### MSE（均方误差，Mean Squared Error）
 
-$$L_{\text{MSE}} = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$$
+$$ 
+L_{\text{MSE}} = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2
+$$
 
 - **变量说明**：$n$ 为样本数量，$y_i$ 为第 $i$ 个样本的真实值，$\hat{y}_i$ 为预测值
 - **特点**：对大误差惩罚重（平方项），对异常值敏感
 
 #### MAE（平均绝对误差，Mean Absolute Error）
 
-$$L_{\text{MAE}} = \frac{1}{n} \sum_{i=1}^{n} |y_i - \hat{y}_i|$$
+$$ 
+L_{\text{MAE}} = \frac{1}{n} \sum_{i=1}^{n} |y_i - \hat{y}_i|
+$$
 
 - **特点**：对异常值更鲁棒，但在零点处不可微
 
 #### Smooth L1（Huber Loss）
 
-$$L_{\text{SmoothL1}} = \begin{cases} 0.5(y_i - \hat{y}_i)^2 & |y_i - \hat{y}_i| < 1 \\ |y_i - \hat{y}_i| - 0.5 & |y_i - \hat{y}_i| \geq 1 \end{cases}$$
+$$ 
+L_{\text{SmoothL1}} = \begin{cases} 0.5(y_i - \hat{y}_i)^2 & |y_i - \hat{y}_i| < 1 \\ |y_i - \hat{y}_i| - 0.5 & |y_i - \hat{y}_i| \geq 1 \end{cases}
+$$
 
 - **特点**：结合了 MSE 和 MAE 的优点，误差小时像 MSE，误差大时像 MAE
 
@@ -82,19 +88,25 @@ $$L_{\text{SmoothL1}} = \begin{cases} 0.5(y_i - \hat{y}_i)^2 & |y_i - \hat{y}_i|
 
 **二分类**：
 
-$$L_{\text{BCE}} = -\frac{1}{n} \sum_{i=1}^{n} [y_i \log(\hat{y}_i) + (1 - y_i) \log(1 - \hat{y}_i)]$$
+$$ 
+L_{\text{BCE}} = -\frac{1}{n} \sum_{i=1}^{n} [y_i \log(\hat{y}_i) + (1 - y_i) \log(1 - \hat{y}_i)]
+$$
 
 - **变量说明**：$y_i \in \{0, 1\}$ 为真实标签，$\hat{y}_i \in (0, 1)$ 为预测概率
 
 **多分类**：
 
-$$L_{\text{CE}} = -\frac{1}{n} \sum_{i=1}^{n} \sum_{c=1}^{C} y_{i,c} \log(\hat{y}_{i,c})$$
+$$ 
+L_{\text{CE}} = -\frac{1}{n} \sum_{i=1}^{n} \sum_{c=1}^{C} y_{i,c} \log(\hat{y}_{i,c})
+$$
 
 - **变量说明**：$C$ 为类别数，$y_{i,c}$ 为 one-hot 编码的真实标签，$\hat{y}_{i,c}$ 为 softmax 后的预测概率
 
 #### Focal Loss
 
-$$L_{\text{Focal}} = -\frac{1}{n} \sum_{i=1}^{n} \alpha_t (1 - p_t)^\gamma \log(p_t)$$
+$$ 
+L_{\text{Focal}} = -\frac{1}{n} \sum_{i=1}^{n} \alpha_t (1 - p_t)^\gamma \log(p_t)
+$$
 
 - **变量说明**：
   - $p_t = \begin{cases} p & \text{if } y = 1 \\ 1-p & \text{if } y = 0 \end{cases}$，是模型对正确类别的预测概率
@@ -105,17 +117,23 @@ $$L_{\text{Focal}} = -\frac{1}{n} \sum_{i=1}^{n} \alpha_t (1 - p_t)^\gamma \log(
 
 #### IoU Loss（交并比损失）
 
-$$L_{\text{IoU}} = 1 - \text{IoU}(B, B^{gt})$$
+$$ 
+L_{\text{IoU}} = 1 - \text{IoU}(B, B^{gt})
+$$
 
 其中 IoU 的计算：
 
-$$\text{IoU} = \frac{|B \cap B^{gt}|}{|B \cup B^{gt}|} = \frac{\text{交集面积}}{\text{并集面积}}$$
+$$ 
+\text{IoU} = \frac{|B \cap B^{gt}|}{|B \cup B^{gt}|} = \frac{\text{交集面积}}{\text{并集面积}}
+$$
 
 - **变量说明**：$B$ 为预测框，$B^{gt}$ 为真实框，$|B \cap B^{gt}|$ 为交集面积，$|B \cup B^{gt}|$ 为并集面积
 
 #### DIoU Loss（距离交并比损失）
 
-$$L_{\text{DIoU}} = 1 - \text{IoU} + \frac{\rho^2(b, b^{gt})}{c^2}$$
+$$ 
+L_{\text{DIoU}} = 1 - \text{IoU} + \frac{\rho^2(b, b^{gt})}{c^2}
+$$
 
 - **变量说明**：
   - $b$ 和 $b^{gt}$ 分别为预测框和真实框的中心点

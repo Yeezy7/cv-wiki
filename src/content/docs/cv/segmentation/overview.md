@@ -118,7 +118,9 @@ U-Net 的对称结构非常优雅，在医学影像中效果极好，因为医�
 
 ### 交并比（Intersection over Union, IoU）
 
-$$IoU = \frac{|M \cap G|}{|M \cup G|}$$
+$$ 
+IoU = \frac{|M \cap G|}{|M \cup G|}
+$$
 
 - $M$：预测掩码（Predicted Mask）
 - $G$：真实掩码（Ground Truth Mask）
@@ -126,7 +128,9 @@ $$IoU = \frac{|M \cap G|}{|M \cup G|}$$
 
 ### 平均交并比（mean Intersection over Union, mIoU）
 
-$$mIoU = \frac{1}{k+1} \sum_{i=0}^{k} \frac{TP_i}{TP_i + FP_i + FN_i}$$
+$$ 
+mIoU = \frac{1}{k+1} \sum_{i=0}^{k} \frac{TP_i}{TP_i + FP_i + FN_i}
+$$
 
 - $k$：类别总数
 - $TP_i$：类别 $i$ 的真正例（正确预测为该类的像素数）
@@ -140,7 +144,9 @@ mIoU 是语义分割最核心的指标，取所有类别 IoU 的平均值。
 
 用于实例分割和全景分割，计算方式与目标检测类似，但用掩码 IoU 替代框 IoU：
 
-$$AP = \int_0^1 p(r) \, dr$$
+$$ 
+AP = \int_0^1 p(r) \, dr
+$$
 
 - $p$：精确率（Precision）
 - $r$：召回率（Recall）
@@ -148,7 +154,9 @@ $$AP = \int_0^1 p(r) \, dr$$
 
 ### 全景质量（Panoptic Quality, PQ）
 
-$$PQ = \underbrace{\frac{\sum_{(p,g) \in TP} IoU(p,g)}{|TP|}}_{\text{SQ (Segmentation Quality)}} \times \underbrace{\frac{|TP|}{|TP| + \frac{1}{2}|FP| + \frac{1}{2}|FN|}}_{\text{RQ (Recognition Quality)}}$$
+$$ 
+PQ = \underbrace{\frac{\sum_{(p,g) \in TP} IoU(p,g)}{|TP|}}_{\text{SQ (Segmentation Quality)}} \times \underbrace{\frac{|TP|}{|TP| + \frac{1}{2}|FP| + \frac{1}{2}|FN|}}_{\text{RQ (Recognition Quality)}}
+$$
 
 - $TP$：匹配的预测-真实对（IoU > 0.5）
 - $FP$：未匹配的预测

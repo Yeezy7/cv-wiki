@@ -82,9 +82,13 @@ Step 4: 缩放和平移（可学习参数）
 
 全局统计量的更新公式：
 
-$$\mu_{running} = (1 - \alpha) \times \mu_{running} + \alpha \times \mu_B$$
+$$ 
+\mu_{running} = (1 - \alpha) \times \mu_{running} + \alpha \times \mu_B
+$$
 
-$$\sigma^2_{running} = (1 - \alpha) \times \sigma^2_{running} + \alpha \times \sigma^2_B$$
+$$ 
+\sigma^2_{running} = (1 - \alpha) \times \sigma^2_{running} + \alpha \times \sigma^2_B
+$$
 
 其中 $\alpha$ 是动量（momentum），默认值通常为 0.1。
 
@@ -103,13 +107,21 @@ $$\sigma^2_{running} = (1 - \alpha) \times \sigma^2_{running} + \alpha \times \s
 
 ### 前向传播
 
-$$\mu_\mathcal{B} = \frac{1}{m} \sum_{i=1}^{m} x_i$$
+$$ 
+\mu_\mathcal{B} = \frac{1}{m} \sum_{i=1}^{m} x_i
+$$
 
-$$\sigma^2_\mathcal{B} = \frac{1}{m} \sum_{i=1}^{m} (x_i - \mu_\mathcal{B})^2$$
+$$ 
+\sigma^2_\mathcal{B} = \frac{1}{m} \sum_{i=1}^{m} (x_i - \mu_\mathcal{B})^2
+$$
 
-$$\hat{x}_i = \frac{x_i - \mu_\mathcal{B}}{\sqrt{\sigma^2_\mathcal{B} + \epsilon}}$$
+$$ 
+\hat{x}_i = \frac{x_i - \mu_\mathcal{B}}{\sqrt{\sigma^2_\mathcal{B} + \epsilon}}
+$$
 
-$$y_i = \gamma \hat{x}_i + \beta$$
+$$ 
+y_i = \gamma \hat{x}_i + \beta
+$$
 
 其中：
 - $m$ 是 mini-batch 的大小
@@ -124,11 +136,17 @@ $$y_i = \gamma \hat{x}_i + \beta$$
 
 BatchNorm 的反向传播需要计算 $\frac{\partial L}{\partial x_i}$、$\frac{\partial L}{\partial \gamma}$ 和 $\frac{\partial L}{\partial \beta}$：
 
-$$\frac{\partial L}{\partial \gamma} = \sum_{i=1}^{m} \frac{\partial L}{\partial y_i} \cdot \hat{x}_i$$
+$$ 
+\frac{\partial L}{\partial \gamma} = \sum_{i=1}^{m} \frac{\partial L}{\partial y_i} \cdot \hat{x}_i
+$$
 
-$$\frac{\partial L}{\partial \beta} = \sum_{i=1}^{m} \frac{\partial L}{\partial y_i}$$
+$$ 
+\frac{\partial L}{\partial \beta} = \sum_{i=1}^{m} \frac{\partial L}{\partial y_i}
+$$
 
-$$\frac{\partial L}{\partial x_i} = \frac{\gamma}{m\sqrt{\sigma^2_\mathcal{B} + \epsilon}} \left( m \frac{\partial L}{\partial y_i} - \sum_{j=1}^{m} \frac{\partial L}{\partial y_j} - \hat{x}_i \sum_{j=1}^{m} \frac{\partial L}{\partial y_j} \cdot \hat{x}_j \right)$$
+$$ 
+\frac{\partial L}{\partial x_i} = \frac{\gamma}{m\sqrt{\sigma^2_\mathcal{B} + \epsilon}} \left( m \frac{\partial L}{\partial y_i} - \sum_{j=1}^{m} \frac{\partial L}{\partial y_j} - \hat{x}_i \sum_{j=1}^{m} \frac{\partial L}{\partial y_j} \cdot \hat{x}_j \right)
+$$
 
 直观理解：反向传播时，梯度不仅与当前样本有关，还与整个 batch 的统计量有关，这意味着 BatchNorm 让 batch 内的样本产生了"信息交互"。
 

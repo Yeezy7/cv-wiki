@@ -55,7 +55,9 @@ CLIP 的核心是**对比学习**：让匹配的图文对在表示空间中靠�
 
 对于一个 batch 中的 $N$ 个图文对 $(I_i, T_i)$：
 
-$$\mathcal{L} = -\frac{1}{N}\sum_{i=1}^{N}\log\frac{\exp(\text{sim}(I_i, T_i)/\tau)}{\sum_{j=1}^{N}\exp(\text{sim}(I_i, T_j)/\tau)}$$
+$$ 
+\mathcal{L} = -\frac{1}{N}\sum_{i=1}^{N}\log\frac{\exp(\text{sim}(I_i, T_i)/\tau)}{\sum_{j=1}^{N}\exp(\text{sim}(I_i, T_j)/\tau)}
+$$
 
 其中：
 - $\text{sim}(I, T)$：图像和文本特征的余弦相似度
@@ -64,7 +66,9 @@ $$\mathcal{L} = -\frac{1}{N}\sum_{i=1}^{N}\log\frac{\exp(\text{sim}(I_i, T_i)/\t
 
 ### 余弦相似度
 
-$$\text{sim}(I, T) = \frac{I \cdot T}{||I|| \cdot ||T||}$$
+$$ 
+\text{sim}(I, T) = \frac{I \cdot T}{||I|| \cdot ||T||}
+$$
 
 ## 代码示例
 

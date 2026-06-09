@@ -106,7 +106,9 @@ YOLOv1 将输入图像划分为 $S \times S$ 的网格。如果某个目标的�
 
 ### 交并比（Intersection over Union, IoU）
 
-$$IoU = \frac{|A \cap B|}{|A \cup B|} = \frac{交集面积}{并集面积}$$
+$$ 
+IoU = \frac{|A \cap B|}{|A \cup B|} = \frac{交集面积}{并集面积}
+$$
 
 - $A$：预测框
 - $B$：真实框（Ground Truth）
@@ -114,18 +116,30 @@ $$IoU = \frac{|A \cap B|}{|A \cup B|} = \frac{交集面积}{并集面积}$$
 
 ### 置信度（Confidence）
 
-$$Confidence = P(Object) \times IoU_{pred}^{truth}$$
+$$ 
+Confidence = P(Object) \times IoU_{pred}^{truth}
+$$
 
 - $P(Object)$：该网格/锚框中是否包含目标
 - $IoU_{pred}^{truth}$：预测框与真实框的 IoU
 
 ### YOLOv1 损失函数
 
-$$\mathcal{L} = \lambda_{coord} \sum_{i=0}^{S^2} \sum_{j=0}^{B} \mathbb{1}_{ij}^{obj} \left[ (x_i - \hat{x}_i)^2 + (y_i - \hat{y}_i)^2 \right]$$
-$$+ \lambda_{coord} \sum_{i=0}^{S^2} \sum_{j=0}^{B} \mathbb{1}_{ij}^{obj} \left[ (\sqrt{w_i} - \sqrt{\hat{w}_i})^2 + (\sqrt{h_i} - \sqrt{\hat{h}_i})^2 \right]$$
-$$+ \sum_{i=0}^{S^2} \sum_{j=0}^{B} \mathbb{1}_{ij}^{obj} (C_i - \hat{C}_i)^2$$
-$$+ \lambda_{noobj} \sum_{i=0}^{S^2} \sum_{j=0}^{B} \mathbb{1}_{ij}^{noobj} (C_i - \hat{C}_i)^2$$
-$$+ \sum_{i=0}^{S^2} \mathbb{1}_{i}^{obj} \sum_{c \in classes} (p_i(c) - \hat{p}_i(c))^2$$
+$$ 
+\mathcal{L} = \lambda_{coord} \sum_{i=0}^{S^2} \sum_{j=0}^{B} \mathbb{1}_{ij}^{obj} \left[ (x_i - \hat{x}_i)^2 + (y_i - \hat{y}_i)^2 \right]
+$$
+$$ 
++ \lambda_{coord} \sum_{i=0}^{S^2} \sum_{j=0}^{B} \mathbb{1}_{ij}^{obj} \left[ (\sqrt{w_i} - \sqrt{\hat{w}_i})^2 + (\sqrt{h_i} - \sqrt{\hat{h}_i})^2 \right]
+$$
+$$ 
++ \sum_{i=0}^{S^2} \sum_{j=0}^{B} \mathbb{1}_{ij}^{obj} (C_i - \hat{C}_i)^2
+$$
+$$ 
++ \lambda_{noobj} \sum_{i=0}^{S^2} \sum_{j=0}^{B} \mathbb{1}_{ij}^{noobj} (C_i - \hat{C}_i)^2
+$$
+$$ 
++ \sum_{i=0}^{S^2} \mathbb{1}_{i}^{obj} \sum_{c \in classes} (p_i(c) - \hat{p}_i(c))^2
+$$
 
 变量说明：
 - $\mathbb{1}_{ij}^{obj}$：第 $i$ 个网格的第 $j$ 个锚框是否负责预测目标（0 或 1）
@@ -138,7 +152,9 @@ $$+ \sum_{i=0}^{S^2} \mathbb{1}_{i}^{obj} \sum_{c \in classes} (p_i(c) - \hat{p}
 
 ### CIoU Loss（YOLOv4+ 使用）
 
-$$\mathcal{L}_{CIoU} = 1 - IoU + \frac{\rho^2(b, b^{gt})}{c^2} + \alpha v$$
+$$ 
+\mathcal{L}_{CIoU} = 1 - IoU + \frac{\rho^2(b, b^{gt})}{c^2} + \alpha v
+$$
 
 - $\rho(b, b^{gt})$：预测框中心与真实框中心的欧氏距离
 - $c$：最小外接框的对角线长度

@@ -1,10 +1,11 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
-import { sharedStarlightOpts } from '../../src/starlight-shared.mjs';
+import { sharedStarlightOpts, sharedMarkdown } from '../../src/starlight-shared.mjs';
 
 export default defineConfig({
   site: 'https://Yeezy7.github.io',
   base: '/ai-wiki/llm',
+  markdown: sharedMarkdown,
   integrations: [
     starlight({
       ...sharedStarlightOpts('llm'),

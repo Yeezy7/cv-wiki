@@ -214,7 +214,7 @@
     min-width: var(--ai-toc-width) !important;
     flex: 0 0 var(--ai-toc-width) !important;
     pointer-events: none;
-    transition: width 0.2s ease;
+    transition: width 0.2s ease, min-width 0.2s ease, flex-basis 0.2s ease;
   }
 
   .right-sidebar {
@@ -340,11 +340,12 @@
   .sl-markdown-content pre {
     font-size: 0.8rem;
     overflow-x: auto;
+    max-height: 14rem;
   }
 
   /* 表格优化 */
   .sl-markdown-content table {
-    display: block;
+    display: table;
     overflow-x: auto;
   }
 
@@ -365,6 +366,144 @@
   .admin-panel {
     width: 100%;
   }
+}
+
+/* 表格美化 */
+.sl-markdown-content table {
+  display: table;
+  width: auto;
+  min-width: 50%;
+  margin-inline: auto;
+  border-collapse: collapse;
+  border-spacing: 0;
+  border: 1px solid color-mix(in srgb, var(--sl-color-hairline-light) 60%, transparent);
+  border-radius: var(--ai-panel-radius);
+  overflow: hidden;
+}
+
+.sl-markdown-content thead {
+  background: color-mix(in srgb, var(--sl-color-accent) 10%, var(--sl-color-bg));
+}
+
+.sl-markdown-content th {
+  padding: 0.65rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: start;
+  color: var(--sl-color-white);
+  border-bottom: 2px solid color-mix(in srgb, var(--sl-color-accent) 30%, transparent);
+}
+
+.sl-markdown-content td {
+  padding: 0.55rem 1rem;
+  font-size: 0.88rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--sl-color-hairline-light) 40%, transparent);
+}
+
+.sl-markdown-content tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--sl-color-gray-6) 30%, transparent);
+}
+
+.sl-markdown-content tbody tr:hover {
+  background: color-mix(in srgb, var(--sl-color-accent) 8%, transparent);
+}
+
+/* 公式样式微调 */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0;
+  text-align: center;
+}
+
+.katex {
+  font-size: 1.05em;
+}
+
+/* 代码块语言标签 */
+.expressive-code pre[data-language] {
+  position: relative;
+}
+
+.expressive-code pre[data-language]::before {
+  content: attr(data-language);
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--sl-color-gray-3);
+  background: color-mix(in srgb, var(--sl-color-gray-6) 70%, transparent);
+  border-bottom-left-radius: 0.35rem;
+  pointer-events: none;
+  user-select: none;
+}
+
+.expressive-code pre[data-language="plaintext"]::before {
+  display: none;
+}
+
+/* 代码块背景和滚动 */
+.expressive-code .frame {
+  border-radius: var(--ai-panel-radius);
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.expressive-code pre {
+  max-height: 14rem;
+  overflow-y: auto;
+  border-radius: var(--ai-panel-radius);
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--sl-color-gray-3) 30%, transparent) transparent;
+}
+
+.expressive-code pre::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.expressive-code pre::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--sl-color-gray-3) 30%, transparent);
+  border-radius: 3px;
+}
+
+.expressive-code pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* 行内代码 */
+.sl-markdown-content :not(pre) > code {
+  padding: 0.12em 0.35em;
+  border-radius: 0.25rem;
+  background: color-mix(in srgb, var(--sl-color-accent) 10%, var(--sl-color-bg));
+  border: 1px solid color-mix(in srgb, var(--sl-color-accent) 18%, transparent);
+  font-size: 0.88em;
+}
+
+/* 引用块 */
+.sl-markdown-content blockquote {
+  border-left: 3px solid var(--sl-color-accent);
+  background: color-mix(in srgb, var(--sl-color-accent) 6%, var(--sl-color-bg));
+  border-radius: 0 var(--ai-panel-radius) var(--ai-panel-radius) 0;
+  padding: 0.8rem 1.1rem;
+  margin: 1rem 0;
+  color: var(--sl-color-gray-2);
+}
+
+.sl-markdown-content blockquote p {
+  margin: 0.3rem 0;
+}
+
+.sl-markdown-content blockquote p:first-child {
+  margin-top: 0;
+}
+
+.sl-markdown-content blockquote p:last-child {
+  margin-bottom: 0;
 }
 
 /* 返回顶部按钮 */

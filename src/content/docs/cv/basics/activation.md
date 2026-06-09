@@ -61,7 +61,9 @@ order: 3
 
 ### Sigmoid
 
-$$\sigma(x) = \frac{1}{1 + e^{-x}}$$
+$$ 
+\sigma(x) = \frac{1}{1 + e^{-x}}
+$$
 
 - **导数**：$\sigma'(x) = \sigma(x)(1 - \sigma(x))$
 - **输出范围**：$(0, 1)$
@@ -69,32 +71,42 @@ $$\sigma(x) = \frac{1}{1 + e^{-x}}$$
 
 ### Tanh
 
-$$\tanh(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}}$$
+$$ 
+\tanh(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}}
+$$
 
 - **导数**：$\tanh'(x) = 1 - \tanh^2(x)$
 - **输出范围**：$(-1, 1)$
 
 ### ReLU
 
-$$\text{ReLU}(x) = \max(0, x)$$
+$$ 
+\text{ReLU}(x) = \max(0, x)
+$$
 
 - **导数**：$\text{ReLU}'(x) = \begin{cases} 1 & x > 0 \\ 0 & x \leq 0 \end{cases}$
 - **输出范围**：$[0, +\infty)$
 
 ### LeakyReLU
 
-$$\text{LeakyReLU}(x) = \begin{cases} x & x > 0 \\ \alpha x & x \leq 0 \end{cases}$$
+$$ 
+\text{LeakyReLU}(x) = \begin{cases} x & x > 0 \\ \alpha x & x \leq 0 \end{cases}
+$$
 
 - **导数**：$\text{LeakyReLU}'(x) = \begin{cases} 1 & x > 0 \\ \alpha & x \leq 0 \end{cases}$
 - **变量说明**：$\alpha$ 通常取 0.01，是负半轴的斜率
 
 ### GELU
 
-$$\text{GELU}(x) = x \cdot \Phi(x)$$
+$$ 
+\text{GELU}(x) = x \cdot \Phi(x)
+$$
 
 其中 $\Phi(x)$ 是标准正态分布的累积分布函数（CDF）：
 
-$$\Phi(x) = \frac{1}{2}\left[1 + \text{erf}\left(\frac{x}{\sqrt{2}}\right)\right]$$
+$$ 
+\Phi(x) = \frac{1}{2}\left[1 + \text{erf}\left(\frac{x}{\sqrt{2}}\right)\right]
+$$
 
 - **近似计算**：$\text{GELU}(x) \approx 0.5x\left[1 + \tanh\left(\sqrt{\frac{2}{\pi}}(x + 0.044715x^3)\right)\right]$
 - **输出范围**：$(-\infty, +\infty)$
@@ -102,7 +114,9 @@ $$\Phi(x) = \frac{1}{2}\left[1 + \text{erf}\left(\frac{x}{\sqrt{2}}\right)\right
 
 ### Swish
 
-$$\text{Swish}(x) = x \cdot \sigma(\beta x) = \frac{x}{1 + e^{-\beta x}}$$
+$$ 
+\text{Swish}(x) = x \cdot \sigma(\beta x) = \frac{x}{1 + e^{-\beta x}}
+$$
 
 - **导数**：$\text{Swish}'(x) = \sigma(\beta x) + x \cdot \beta \sigma(\beta x)(1 - \sigma(\beta x))$
 - **变量说明**：$\beta$ 为可学习参数或固定值 1（此时称为 SiLU）
