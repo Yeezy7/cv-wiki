@@ -42,6 +42,12 @@ export default defineConfig({
             { label: '图像分割综述', slug: 'segmentation/overview' },
           ],
         },
+        {
+          label: 'PyTorch 基础',
+          items: [
+            { label: 'Dataset', slug: 'pytorch/dataset' },
+          ],
+        },
       ],
     }),
   ],

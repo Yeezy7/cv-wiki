@@ -260,6 +260,10 @@
     color: color-mix(in srgb, var(--sl-color-white) 88%, var(--sl-color-green)) !important;
   }
 
+  .right-sidebar-panel li {
+    padding-inline-start: calc(var(--depth, 0) * 0.75rem);
+  }
+
   .right-sidebar-panel a {
     border-radius: var(--ai-panel-radius);
     padding: 0.34rem 0.5rem !important;
