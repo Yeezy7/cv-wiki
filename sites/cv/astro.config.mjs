@@ -46,6 +46,8 @@ export default defineConfig({
           label: 'PyTorch 基础',
           items: [
             { label: 'Dataset', slug: 'pytorch/dataset' },
+            { label: 'DataLoader', slug: 'pytorch/dataloader' },
+            { label: 'Transforms', slug: 'pytorch/transforms' },
           ],
         },
       ],

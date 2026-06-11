@@ -1,0 +1,117 @@
+---
+const { id, sidebar } = Astro.locals.starlightRoute;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+
+// 从当前页面 ID 生成面包屑
+function buildBreadcrumbs(pageId: string) {
+  const crumbs = [{ label: '首页', href: base }];
+
+  if (!pageId) return crumbs;
+
+  const parts = pageId.split('/');
+  let currentPath = '';
+
+  for (let i = 0; i < parts.length; i++) {
+    currentPath += (currentPath ? '/' : '') + parts[i];
+    const isLast = i === parts.length - 1;
+
+    // 尝试从 sidebar 中找到对应条目的 label
+    const label = findLabelInSidebar(sidebar, currentPath) || formatLabel(parts[i]);
+
+    crumbs.push({
+      label,
+      href: isLast ? undefined : `${base}${currentPath}/`,
+    });
+  }
+
+  return crumbs;
+}
+
+function findLabelInSidebar(items: any[], path: string): string | null {
+  for (const item of items) {
+    if (item.type === 'link' && item.slug === path) return item.label;
+    if (item.type === 'group' && item.entries) {
+      const found = findLabelInSidebar(item.entries, path);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+function formatLabel(segment: string): string {
+  // 常见缩写展开
+  const map: Record<string, string> = {
+    cv: '计算机视觉',
+    llm: '大语言模型',
+    basics: '基础',
+    detection: '目标检测',
+    segmentation: '图像分割',
+    pytorch: 'PyTorch',
+    guide: '指南',
+    interview: '面试',
+    multimodal: '多模态',
+  };
+  return map[segment] || segment;
+}
+
+const crumbs = buildBreadcrumbs(id ?? '');
+---
+
+{crumbs.length > 1 && (
+  <nav class="breadcrumbs" aria-label="面包屑导航">
+    <ol>
+      {crumbs.map((crumb, i) => (
+        <li>
+          {crumb.href ? (
+            <a href={crumb.href}>{crumb.label}</a>
+          ) : (
+            <span aria-current="page">{crumb.label}</span>
+          )}
+        </li>
+      ))}
+    </ol>
+  </nav>
+)}
+
+<style>
+  .breadcrumbs {
+    margin-bottom: 0.75rem;
+    font-size: 0.8rem;
+    color: var(--sl-color-gray-3);
+  }
+
+  .breadcrumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.15rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .breadcrumbs li {
+    display: flex;
+    align-items: center;
+  }
+
+  .breadcrumbs li:not(:last-child)::after {
+    content: '/';
+    margin-left: 0.35rem;
+    color: var(--sl-color-gray-4);
+  }
+
+  .breadcrumbs a {
+    color: var(--sl-color-gray-3);
+    text-decoration: none;
+    transition: color 0.16s ease;
+  }
+
+  .breadcrumbs a:hover {
+    color: var(--sl-color-white);
+  }
+
+  .breadcrumbs span[aria-current='page'] {
+    color: var(--sl-color-gray-2);
+  }
+</style>

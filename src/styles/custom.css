@@ -311,7 +311,21 @@
 }
 
 .pagination-links {
-  display: none !important;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid color-mix(in srgb, var(--sl-color-hairline-light) 60%, transparent);
+}
+
+.pagination-links a {
+  border-radius: var(--ai-panel-radius);
+  padding: 0.6rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--sl-color-hairline-light) 60%, transparent);
+  transition: border-color 0.16s ease, background 0.16s ease;
+}
+
+.pagination-links a:hover {
+  border-color: var(--sl-color-accent);
+  background: color-mix(in srgb, var(--sl-color-accent) 8%, transparent);
 }
 
 /* 移动端适配 */

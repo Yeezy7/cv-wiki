@@ -2,7 +2,10 @@
 title: 激活函数
 description: 深度学习中常用激活函数的原理、对比与工程实践
 category: cv
-tags: [activation, relu, basics]
+tags:
+  - activation
+  - relu
+  - basics
 status: stable
 order: 3
 ---

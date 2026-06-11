@@ -4,8 +4,9 @@ import CommentsWrapper from './CommentsWrapper.astro';
 import AdminPanel from './AdminPanel.astro';
 import UserAuth from './UserAuth.astro';
 import BackToTop from './BackToTop.astro';
-
-
+import Breadcrumbs from './Breadcrumbs.astro';
+import ReadingProgress from './ReadingProgress.astro';
+import ReadingTime from './ReadingTime.astro';
 import SidebarPanel from './SidebarPanel.astro';
 
 const { ...props } = Astro.props;
@@ -30,10 +31,13 @@ const showSidebarControls = starlightRoute.hasSidebar && frontmatter.template !=
 ---
 
 <Default {...props}>
+  {!isNotFoundPage && <Breadcrumbs />}
+  {showArticleEnhancements && <ReadingTime />}
   <slot />
 </Default>
 
 {showSidebarControls && <SidebarPanel />}
+{showArticleEnhancements && <ReadingProgress />}
 
 {
   showArticleEnhancements && (

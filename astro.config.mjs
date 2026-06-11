@@ -25,6 +25,7 @@ export default defineConfig({
             { label: '项目介绍', slug: 'index' },
             { label: '学习路线', slug: 'guide/roadmap' },
             { label: '如何使用', slug: 'guide/how-to-use' },
+            { label: '标签索引', slug: 'tags' },
           ],
         },
       ],

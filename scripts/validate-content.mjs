@@ -98,23 +98,46 @@ function validateDoc(file) {
 }
 
 function parseFrontmatter(source) {
-  if (!source.startsWith('---\n')) return null;
+  const normalized = source.replace(/\r\n/g, '\n');
+  if (!normalized.startsWith('---\n')) return null;
 
-  const end = source.indexOf('\n---', 4);
+  const end = normalized.indexOf('\n---', 4);
   if (end === -1) return null;
 
-  const block = source.slice(4, end).trim();
+  const block = normalized.slice(4, end).trim();
   const data = {};
 
-  for (const rawLine of block.split('\n')) {
+  const lines = block.split('\n');
+  let currentKey = '';
+  let currentArray = null;
+
+  for (const rawLine of lines) {
     const line = rawLine.trim();
     if (!line || line.startsWith('#')) continue;
 
+    // 多行数组项：  - value
+    const arrayMatch = line.match(/^-\s+(.+)$/);
+    if (arrayMatch && currentKey) {
+      if (currentArray === null) currentArray = [];
+      currentArray.push(stripQuotes(arrayMatch[1].trim()));
+      data[currentKey] = currentArray;
+      continue;
+    }
+
+    // 键值对
     const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
     if (!match) continue;
 
     const [, key, rawValue] = match;
-    data[key] = parseValue(rawValue);
+    currentKey = key;
+    currentArray = null;
+
+    if (rawValue.trim() === '') {
+      // 值为空，可能是多行数组的开始
+      data[key] = undefined;
+    } else {
+      data[key] = parseValue(rawValue);
+    }
   }
 
   return data;

@@ -45,7 +45,7 @@ const isGiscusEnabled = Boolean(giscusRepoId && giscusCategoryId);
   ) : (
     <div class="comments-disabled">
       <p>评论功能尚未启用。配置 Giscus 的仓库 ID 和分类 ID 后会自动显示评论区。</p>
-      <a href="https://github.com/Yeezy7/ai-wiki/discussions">前往 GitHub Discussions</a>
+      <a href={`https://github.com/${giscusRepo}/discussions`}>前往 GitHub Discussions</a>
     </div>
   )
 }

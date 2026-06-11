@@ -49,7 +49,7 @@ export function sharedStarlightOpts(siteDir) {
     customCss: ['katex/dist/katex.min.css', './src/styles/custom.css'],
     editLink: { baseUrl: editBaseUrl(siteDir) },
     lastUpdated: true,
-    pagination: false,
+    pagination: true,
     tableOfContents: { minHeadingLevel: 2, maxHeadingLevel: 3 },
     social: sharedSocial,
     expressiveCode: {
