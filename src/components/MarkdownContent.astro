@@ -7,6 +7,7 @@ import BackToTop from './BackToTop.astro';
 import Breadcrumbs from './Breadcrumbs.astro';
 import ReadingProgress from './ReadingProgress.astro';
 import ReadingTime from './ReadingTime.astro';
+import RelatedArticles from './RelatedArticles.astro';
 import SidebarPanel from './SidebarPanel.astro';
 
 const { ...props } = Astro.props;
@@ -34,6 +35,7 @@ const showSidebarControls = starlightRoute.hasSidebar && frontmatter.template !=
   {!isNotFoundPage && <Breadcrumbs />}
   {showArticleEnhancements && <ReadingTime />}
   <slot />
+  {showArticleEnhancements && <RelatedArticles />}
 </Default>
 
 {showSidebarControls && <SidebarPanel />}

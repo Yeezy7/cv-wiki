@@ -67,6 +67,7 @@ for site in "${SITES[@]}"; do
 
   check_or_link "$style_target/custom.css" "../../../../src/styles/custom.css" || has_drift=1
   check_or_link "$i18n_target/zh-CN.json" "../../../../../src/content/i18n/zh-CN.json" || has_drift=1
+  check_or_link "$ROOT_DIR/sites/$site/src/content/config.ts" "../../../../src/content/config.ts" || has_drift=1
 done
 
 if [[ "$MODE" == "--check" ]]; then
