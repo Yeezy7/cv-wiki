@@ -22,6 +22,7 @@ export default defineConfig({
           label: '核心模型',
           items: [
             { label: 'CLIP', slug: 'clip' },
+            { label: 'ViT 视觉 Transformer', slug: 'vit' },
           ],
         },
       ],

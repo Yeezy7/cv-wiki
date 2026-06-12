@@ -22,6 +22,7 @@ export default defineConfig({
           label: '面试题',
           items: [
             { label: 'CV 面试题', slug: 'cv' },
+            { label: 'LLM 面试题', slug: 'llm' },
           ],
         },
       ],

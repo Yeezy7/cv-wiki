@@ -24,6 +24,13 @@ export default defineConfig({
             { label: 'Transformer', slug: 'transformer' },
           ],
         },
+        {
+          label: '训练与应用',
+          items: [
+            { label: 'Fine-tuning 与 LoRA', slug: 'fine-tuning' },
+            { label: 'RAG 检索增强生成', slug: 'rag' },
+          ],
+        },
       ],
     }),
   ],

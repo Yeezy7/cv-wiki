@@ -9,6 +9,7 @@ export default defineConfig({
   integrations: [
     starlight({
       ...sharedStarlightOpts(''),
+      pagination: false,
       title: 'AI Wiki',
       description: '面向 AI 学习、面试和工程实践的开源知识库',
       editLink: { baseUrl: 'https://github.com/Yeezy7/ai-wiki/edit/main' },

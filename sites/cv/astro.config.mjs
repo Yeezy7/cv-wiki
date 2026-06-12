@@ -48,6 +48,7 @@ export default defineConfig({
             { label: 'Dataset', slug: 'pytorch/dataset' },
             { label: 'DataLoader', slug: 'pytorch/dataloader' },
             { label: 'Transforms', slug: 'pytorch/transforms' },
+            { label: '神经网络', slug: 'pytorch/神经网络' },
           ],
         },
       ],
