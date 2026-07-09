@@ -8,7 +8,6 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MODE="${1:-sync}"
 SITES=("cv" "llm" "multimodal" "interview")
 COMPONENTS=(
-  "AIChat.astro"
   "AdminPanel.astro"
   "BackToHome.astro"
   "BackToTop.astro"
@@ -17,10 +16,14 @@ COMPONENTS=(
   "Head.astro"
   "LazyImage.astro"
   "MarkdownContent.astro"
+  "Mermaid.astro"
   "SEOHead.astro"
   "SidebarPanel.astro"
   "SiteTitle.astro"
   "UserAuth.astro"
+)
+REMOVED_COMPONENTS=(
+  "AIChat.astro"
 )
 
 if [[ "$MODE" != "sync" && "$MODE" != "--check" ]]; then
@@ -59,6 +62,9 @@ for site in "${SITES[@]}"; do
 
   if [[ "$MODE" == "sync" ]]; then
     mkdir -p "$component_target" "$style_target" "$i18n_target"
+    for component in "${REMOVED_COMPONENTS[@]}"; do
+      rm -f "$component_target/$component"
+    done
   fi
 
   for component in "${COMPONENTS[@]}"; do

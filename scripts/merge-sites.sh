@@ -16,8 +16,9 @@ for site in "${SITES[@]}"; do
     echo "错误：$src 不存在，请先构建子站。" >&2
     exit 1
   fi
+  rm -rf "$DIST/$site"
   mkdir -p "$DIST/$site"
-  cp -r "$src/"* "$DIST/$site/"
+  cp -R "$src/." "$DIST/$site/"
   echo "已合并 $site"
 done
 

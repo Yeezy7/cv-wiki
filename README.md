@@ -1,114 +1,124 @@
+<div align="center">
+
 # AI Wiki
 
-面向 AI 学习、面试和工程实践的开源知识库。
+**Open-source knowledge base for AI learning, interview prep, and engineering practice**
 
-## 项目简介
+[![GitHub stars](https://img.shields.io/github/stars/Yeezy7/ai-wiki?style=flat-square)](https://github.com/Yeezy7/ai-wiki/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/Yeezy7/ai-wiki?style=flat-square)](https://github.com/Yeezy7/ai-wiki/network/members)
+[![License](https://img.shields.io/github/license/Yeezy7/ai-wiki?style=flat-square)](https://github.com/Yeezy7/ai-wiki/blob/main/LICENSE)
+[![Deploy](https://img.shields.io/badge/deployed-live-brightgreen?style=flat-square)](https://yeezy7.github.io/ai-wiki/)
 
-AI Wiki 是一个综合性的 AI 知识库，涵盖多个领域：
+[![Deploy to GitHub Pages](https://github.com/Yeezy7/ai-wiki/actions/workflows/deploy.yml/badge.svg)](https://github.com/Yeezy7/ai-wiki/actions/workflows/deploy.yml)
 
-- **计算机视觉** — CNN、目标检测、图像分割、模型部署
-- **大语言模型** — Transformer、RAG、Fine-tuning、RLHF
-- **多模态** — CLIP、ViT、Grounding
+[**Live Demo**](https://yeezy7.github.io/ai-wiki/) · [**Quick Start**](#quick-start) · [**Contributing**](CONTRIBUTING.md)
 
-每个知识点都做到：
-- **能学懂** — 从直觉出发，配合图示和代码
-- **能面试** — 附带标准回答和高频追问
-- **能落地** — 包含工程实践和常见坑
-- **能查阅** — 结构化组织，快速定位
+</div>
 
-## 内容模块
+---
 
-### 计算机视觉
-- 深度学习基础（CNN、BatchNorm、激活函数、损失函数）
-- 目标检测（R-CNN、YOLO、NMS、mAP）
-- 图像分割（U-Net、DeepLab、Mask R-CNN）
-- 图像处理（滤波、边缘检测、形态学操作）
-- 模型部署（ONNX、TensorRT、量化）
+## ✨ Features
 
-### 大语言模型
-- Transformer 架构
-- 注意力机制
-- RAG 检索增强生成
-- Fine-tuning 微调技术
-- RLHF 人类反馈强化学习
+- 📚 **Systematic Content** — From basics to advanced, covering CV, LLM, and multimodal
+- 🎯 **Interview Ready** — Standard answers and frequently asked questions for each topic
+- 💻 **Code Examples** — Complete implementations in Python + PyTorch/OpenCV
+- 🚀 **Production Ready** — Deployment optimization, performance tuning, common pitfalls
+- 📖 **Clear Structure** — Modular organization with full-text search
 
-### 多模态
-- CLIP 对比学习
-- ViT 视觉 Transformer
-- Grounding 视觉定位
+## 📂 Modules
 
-## 本地开发
+| Module | Topics |
+|--------|--------|
+| **Computer Vision** | CNN, Object Detection, Image Segmentation, Image Processing, Model Deployment |
+| **Large Language Models** | Transformer, RAG, Fine-tuning, RLHF |
+| **Multimodal** | CLIP, ViT, Grounding |
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+
+- npm 9+
+
+### Local Development
 
 ```bash
-# 安装依赖
+# Clone the repo
+git clone https://github.com/Yeezy7/ai-wiki.git
+cd ai-wiki
+
+# Install dependencies
 npm install
 
-# 启动开发服务器
+# Start dev server
 npm run dev
-
-# 构建生产版本
-npm run build
-
-# 预览生产版本
-npm run preview
-
-# 同步共享组件到各子站
-npm run sync:shared
-
-# 强制刷新根站和子站内容索引
-npm run sync:content
-
-# 检查共享组件是否漂移，并校验文章 frontmatter 和内部链接
-npm run check
-
-# 构建主站与所有子站，并合并输出
-npm run build:all
 ```
 
-项目使用 npm workspaces 管理 `sites/*` 子站脚本。`npm run build:all` 会先同步共享组件、样式和中文翻译，再运行工程校验、刷新内容索引，最后构建主站及所有子站。
+Visit http://localhost:4321 to view the site.
 
-共享组件以根站 `src/components/`、`src/styles/custom.css`、`src/content/i18n/zh-CN.json` 为来源。修改共享 UI 后先运行 `npm run sync:shared`，提交前运行 `npm run check`。
-
-## 可选配置
-
-评论区使用 Giscus，仅在普通文章页展示。未配置时文章页会显示“评论功能尚未启用”的说明，不会加载空配置脚本。
+### Available Commands
 
 ```bash
-PUBLIC_GISCUS_REPO=Yeezy7/ai-wiki
-PUBLIC_GISCUS_REPO_ID=你的 Giscus repo id
-PUBLIC_GISCUS_CATEGORY=Announcements
-PUBLIC_GISCUS_CATEGORY_ID=你的 Giscus category id
+npm run dev          # Start dev server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run build:all    # Build main site and all subsites
+npm run check        # Validate content and links
 ```
 
-AI 问答助手源码暂时保留，但当前不会在页面中渲染。后续如果要开启，建议先补后端代理或明确浏览器端密钥方案。
+## 🏗️ Project Structure
 
-## 内容规范
+```
+ai-wiki/
+├── src/
+│   ├── content/docs/    # Documentation (Markdown/MDX)
+│   ├── components/      # Shared components
+│   └── styles/          # Global styles
+├── sites/               # Subsites (CV, LLM, Multimodal)
+├── public/              # Static assets
+├── astro.config.mjs     # Site configuration
+└── package.json
+```
 
-所有文章必须包含以下 frontmatter 字段：
+## 📝 Content Format
+
+Article frontmatter:
 
 ```yaml
-title: 标题
-description: 一句话描述
-category: cv
-tags: [tag-a, tag-b]
-status: stable
+---
+title: Article Title
+description: One-line description
+category: cv | llm | multimodal
+tags: [tag1, tag2]
+status: draft | review | stable
 order: 1
+---
 ```
 
-`status` 只能使用 `draft`、`review`、`stable`。`npm run validate:content` 会检查根站和所有子站内容。
+## 🛠️ Tech Stack
 
-内部链接建议使用带 `/ai-wiki` 前缀的站点绝对路径，或使用相对路径。`npm run validate:links` 会检查 Markdown/MDX 中的内部页面、静态资源和锚点链接。
+- [Astro](https://astro.build/) — Modern static site generator
+- [Starlight](https://starlight.astro.build/) — Documentation site theme
+- [GitHub Pages](https://pages.github.com/) — Free hosting
 
-## 技术栈
+## 🤝 Contributing
 
-- [Astro](https://astro.build/) — 现代化的静态站点生成器
-- [Starlight](https://starlight.astro.build/) — 文档站点主题
-- Markdown / MDX — 内容格式
+Contributions are welcome! Please see [Contributing Guide](CONTRIBUTING.md).
 
-## 贡献
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-欢迎贡献！请查看 [贡献指南](CONTRIBUTING.md)。
+## 📄 License
 
-## 许可证
+This project is licensed under the [MIT License](LICENSE).
 
-MIT License
+---
+
+<div align="center">
+
+**[Live Demo](https://yeezy7.github.io/ai-wiki/)** · **[GitHub](https://github.com/Yeezy7/ai-wiki)**
+
+</div>

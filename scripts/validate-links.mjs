@@ -170,23 +170,32 @@ function resolveInternalTarget(page, target) {
 
 function resolveAsset(page, pathWithoutQuery) {
   if (pathWithoutQuery.startsWith('/')) {
-    for (const site of sites) {
-      if (site.name !== 'root' && (pathWithoutQuery === site.base || pathWithoutQuery.startsWith(`${site.base}/`))) {
-        const sitePublicPath = pathWithoutQuery.slice(site.base.length) || '/';
-        return { assetPath: join(rootDir, 'sites', site.name, 'public', sitePublicPath) };
+    // Remove base path prefix for root site assets
+    let publicPath = pathWithoutQuery;
+    if (page.site.name === 'root' && pathWithoutQuery.startsWith('/ai-wiki/')) {
+      publicPath = pathWithoutQuery.slice('/ai-wiki'.length);
+    }
+
+    // For multi-site projects, check the site's public directory first
+    if (page.site.name !== 'root') {
+      // For sub-sites, the asset path after base should be relative to site's public dir
+      const siteBase = page.site.base;
+      if (pathWithoutQuery.startsWith(siteBase + '/')) {
+        const relativePath = pathWithoutQuery.slice(siteBase.length);
+        const sitePublicPath = join(rootDir, 'sites', page.site.name, 'public', relativePath);
+        if (existsSync(sitePublicPath)) {
+          return { assetPath: sitePublicPath };
+        }
+      }
+
+      // Also check site's public dir for absolute paths without site base prefix
+      const sitePublicPath = join(rootDir, 'sites', page.site.name, 'public', publicPath);
+      if (existsSync(sitePublicPath)) {
+        return { assetPath: sitePublicPath };
       }
     }
 
-    if (pathWithoutQuery.startsWith('/ai-wiki/')) {
-      return { assetPath: join(rootDir, 'public', pathWithoutQuery.slice('/ai-wiki'.length)) };
-    }
-
-    const sitePublicRoot =
-      page.site.name === 'root'
-        ? join(rootDir, 'public')
-        : join(rootDir, 'sites', page.site.name, 'public');
-
-    return { assetPath: join(sitePublicRoot, pathWithoutQuery) };
+    return { assetPath: join(rootDir, 'public', publicPath) };
   }
 
   return { assetPath: join(dirname(page.file), pathWithoutQuery) };
