@@ -13,6 +13,10 @@ order: 1
 
 CLIP（Contrastive Language-Image Pre-training）是一种通过对比学习在大规模图文对上预训练的模型，能够实现零样本图像分类。
 
+![CLIP 概览](/images/multimodal/clip/clip_overview.png)
+
+*CLIP 模型概览：联合训练图像编码器和文本编码器，学习图文对齐（来源：CLIP 论文 Figure 1）*
+
 ## 它解决什么问题
 
 传统的视觉模型存在以下问题：
@@ -34,6 +38,10 @@ CLIP 的核心是**对比学习**：让匹配的图文对在表示空间中靠�
 ## 算法流程
 
 ### 训练过程
+
+![CLIP 核心伪代码](/images/multimodal/clip/clip_pseudocode.png)
+
+*CLIP 核心实现伪代码：计算相似度矩阵并优化对称交叉熵损失（来源：CLIP 论文 Figure 3）*
 
 1. 准备大规模图文对数据集
 2. 使用图像编码器提取图像特征

@@ -1,4 +1,9 @@
 ---
+import {
+  narrowViewportMediaQuery,
+  sidebarSizing,
+  sidebarStorageKeys,
+} from '../sidebar-config';
 ---
 
 <button
@@ -61,35 +66,35 @@
 
 <div id="ai-right-resizer" class="ai-sidebar-resizer ai-right-resizer" aria-hidden="true"></div>
 
-<script>
-  // 注意：sidebarSizing 配置与 Head.astro 中的值必须保持同步。
+<script is:inline define:vars={{ narrowViewportMediaQuery, sidebarSizing, sidebarStorageKeys }}>
   // Head.astro 用 is:inline 在绘制前执行防止 FOUC，这里在 DOMContentLoaded 后执行完整交互逻辑。
-  const sidebarSizing = {
-    leftMin: 220,
-    leftMax: 420,
-    leftDefault: 300,
-    leftCollapseAt: 168,
-    rightMin: 220,
-    rightMax: 360,
-    rightDefault: 280,
-    rightCollapseAt: 168,
-  };
+  const storageKeys = sidebarStorageKeys;
 
-  const clampSidebarSize = (value: number, min: number, max: number) =>
+  // 支持通过 URL 参数 ?reset-sidebar=true 重置侧边栏状态
+  if (window.location.search.includes('reset-sidebar=true')) {
+    localStorage.removeItem(storageKeys.leftCollapsed);
+    localStorage.removeItem(storageKeys.rightCollapsed);
+    localStorage.removeItem(storageKeys.leftWidth);
+    localStorage.removeItem(storageKeys.rightWidth);
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+
+  const clampSidebarSize = (value, min, max) =>
     Math.max(min, Math.min(max, value));
 
-  const readSidebarSize = (key: string, fallback: number, min: number, max: number) => {
+  const readSidebarSize = (key, fallback, min, max) => {
     const value = Number.parseInt(localStorage.getItem(key) || '', 10);
     return Number.isFinite(value) ? clampSidebarSize(value, min, max) : fallback;
   };
 
   const restoreSidebarState = () => {
     const root = document.documentElement;
+    const isNarrowViewport = window.matchMedia(narrowViewportMediaQuery).matches;
     root.classList.add('ai-sidebar-initializing');
     root.style.setProperty(
       '--sl-sidebar-width',
       `${readSidebarSize(
-        'ai-left-sidebar-width',
+        storageKeys.leftWidth,
         sidebarSizing.leftDefault,
         sidebarSizing.leftMin,
         sidebarSizing.leftMax
@@ -98,28 +103,28 @@
     root.style.setProperty(
       '--ai-toc-width',
       `${readSidebarSize(
-        'ai-right-sidebar-width',
+        storageKeys.rightWidth,
         sidebarSizing.rightDefault,
         sidebarSizing.rightMin,
         sidebarSizing.rightMax
       )}px`
     );
-    root.classList.toggle(
-      'ai-left-collapsed',
-      localStorage.getItem('ai-left-sidebar-collapsed') === 'true'
-    );
-    root.classList.toggle(
-      'ai-right-collapsed',
-      localStorage.getItem('ai-right-sidebar-collapsed') === 'true'
-    );
+    // 默认展开：只有当用户明确存储了折叠状态为 'true' 时才折叠
+    const leftStored = localStorage.getItem(storageKeys.leftCollapsed);
+    const rightStored = localStorage.getItem(storageKeys.rightCollapsed);
+    const leftCollapsed = leftStored === 'true';
+    const rightCollapsed = rightStored === 'true';
+    root.classList.toggle('ai-left-collapsed', leftCollapsed);
+    root.classList.toggle('ai-right-collapsed', rightCollapsed);
   };
 
   restoreSidebarState();
 
   document.addEventListener('DOMContentLoaded', () => {
     const root = document.documentElement;
-    const leftSidebar = document.querySelector<HTMLElement>('#starlight__sidebar');
-    const rightSidebar = document.querySelector<HTMLElement>('.right-sidebar');
+    const narrowViewport = window.matchMedia(narrowViewportMediaQuery);
+    const leftSidebar = document.querySelector('#starlight__sidebar');
+    const rightSidebar = document.querySelector('.right-sidebar');
     const leftCollapse = document.getElementById('ai-left-collapse');
     const leftExpand = document.getElementById('ai-left-expand');
     const leftResizer = document.getElementById('ai-left-resizer');
@@ -132,64 +137,84 @@
       return;
     }
 
-    const setLeftWidth = (width: number) => {
+    const setLeftWidth = (width) => {
       const nextWidth = clampSidebarSize(width, sidebarSizing.leftMin, sidebarSizing.leftMax);
       root.style.setProperty('--sl-sidebar-width', `${nextWidth}px`);
-      localStorage.setItem('ai-left-sidebar-width', String(nextWidth));
+      localStorage.setItem(storageKeys.leftWidth, String(nextWidth));
     };
 
-    const setRightWidth = (width: number) => {
+    const setRightWidth = (width) => {
       const nextWidth = clampSidebarSize(width, sidebarSizing.rightMin, sidebarSizing.rightMax);
       root.style.setProperty('--ai-toc-width', `${nextWidth}px`);
-      localStorage.setItem('ai-right-sidebar-width', String(nextWidth));
+      localStorage.setItem(storageKeys.rightWidth, String(nextWidth));
     };
 
-    const setLeftCollapsed = (collapsed: boolean) => {
+    const setLeftCollapsed = (collapsed, persist = true) => {
       root.classList.toggle('ai-left-collapsed', collapsed);
       leftCollapse?.setAttribute('aria-expanded', String(!collapsed));
       leftExpand?.setAttribute('aria-expanded', String(!collapsed));
-      localStorage.setItem('ai-left-sidebar-collapsed', String(collapsed));
+      if (persist) {
+        localStorage.setItem(storageKeys.leftCollapsed, String(collapsed));
+      }
     };
 
-    const setRightCollapsed = (collapsed: boolean) => {
+    const setRightCollapsed = (collapsed, persist = true) => {
       root.classList.toggle('ai-right-collapsed', collapsed);
       rightCollapse?.setAttribute('aria-expanded', String(!collapsed));
       rightExpand?.setAttribute('aria-expanded', String(!collapsed));
-      localStorage.setItem('ai-right-sidebar-collapsed', String(collapsed));
+      if (persist) {
+        localStorage.setItem(storageKeys.rightCollapsed, String(collapsed));
+      }
+    };
+
+    const syncResponsiveSidebarState = () => {
+      if (narrowViewport.matches) {
+        setLeftCollapsed(true, false);
+        if (rightSidebar) {
+          setRightCollapsed(true, false);
+        }
+        return;
+      }
+
+      setLeftCollapsed(localStorage.getItem(storageKeys.leftCollapsed) === 'true');
+      if (rightSidebar) {
+        setRightCollapsed(localStorage.getItem(storageKeys.rightCollapsed) === 'true');
+      }
     };
 
     setLeftWidth(
       readSidebarSize(
-        'ai-left-sidebar-width',
+        storageKeys.leftWidth,
         sidebarSizing.leftDefault,
         sidebarSizing.leftMin,
         sidebarSizing.leftMax
       )
     );
-    setLeftCollapsed(localStorage.getItem('ai-left-sidebar-collapsed') === 'true');
 
     if (rightSidebar) {
       setRightWidth(
         readSidebarSize(
-          'ai-right-sidebar-width',
+          storageKeys.rightWidth,
           sidebarSizing.rightDefault,
           sidebarSizing.rightMin,
           sidebarSizing.rightMax
         )
       );
-      setRightCollapsed(localStorage.getItem('ai-right-sidebar-collapsed') === 'true');
     } else {
       rightCollapse?.setAttribute('hidden', '');
       rightExpand?.setAttribute('hidden', '');
       rightResizer?.setAttribute('hidden', '');
     }
 
+    syncResponsiveSidebarState();
+    narrowViewport.addEventListener('change', syncResponsiveSidebarState);
+
     const bindHoverTools = (
-      elements: Array<Element | null>,
-      className: string,
-      isCollapsed: () => boolean
+      elements,
+      className,
+      isCollapsed
     ) => {
-      let hideTimer: number | undefined;
+      let hideTimer;
       const show = () => {
         if (hideTimer) window.clearTimeout(hideTimer);
         if (!isCollapsed()) root.classList.add(className);
@@ -223,13 +248,7 @@
     rightCollapse?.addEventListener('click', () => setRightCollapsed(true));
     rightExpand?.addEventListener('click', () => setRightCollapsed(false));
 
-    let activeDrag:
-      | {
-          side: 'left' | 'right';
-          startX: number;
-          startWidth: number;
-        }
-      | undefined;
+    let activeDrag;
 
     leftResizer?.addEventListener('mousedown', (event) => {
       activeDrag = {
@@ -306,8 +325,8 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    opacity: 0;
-    pointer-events: none;
+    opacity: 0.8;
+    pointer-events: auto;
     transform: translateY(-1px) scale(0.96);
     transition:
       opacity 0.16s ease,
@@ -357,15 +376,12 @@
   }
 
   @media (min-width: 50rem) {
-    :root {
-      --ai-left-panel-width: calc(var(--sl-sidebar-width) - (var(--ai-sidebar-gap) * 1.35));
-      --ai-right-panel-width: calc(var(--ai-toc-width) - var(--ai-sidebar-gap));
-    }
-
     .ai-left-collapse {
       display: flex;
       top: calc(var(--sl-nav-height) + var(--ai-sidebar-gap) + 0.75rem);
       left: calc(var(--ai-sidebar-gap) + var(--ai-left-panel-width) - 1rem);
+      opacity: 1;
+      pointer-events: auto;
     }
 
     .ai-left-expand {
@@ -374,45 +390,34 @@
       left: 0.5rem;
       opacity: 0;
       visibility: hidden;
-      transform: translateX(-0.25rem);
+      pointer-events: none;
     }
 
     .ai-left-resizer {
-      display: block;
+      display: none;
       top: calc(var(--sl-nav-height) + var(--ai-sidebar-gap));
       bottom: var(--ai-sidebar-gap);
       left: calc(var(--ai-sidebar-gap) + var(--ai-left-panel-width) - 0.35rem);
     }
 
-    .ai-left-tools-visible .ai-left-collapse,
-    .ai-left-tools-visible .ai-left-resizer,
-    .ai-sidebar-dragging .ai-left-collapse,
-    .ai-sidebar-dragging .ai-left-resizer {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateY(0);
-    }
-
-    .ai-left-collapsed .ai-left-collapse,
-    .ai-left-collapsed .ai-left-resizer {
+    .ai-left-collapsed .ai-left-collapse {
       opacity: 0;
       pointer-events: none;
       visibility: hidden;
     }
 
     .ai-left-collapsed .ai-left-expand {
-      opacity: 0.9;
+      opacity: 1;
       pointer-events: auto;
       visibility: visible;
-      transform: translateX(0);
     }
-  }
 
-  @media (min-width: 72rem) {
     .ai-right-collapse {
       display: flex;
       top: calc(var(--sl-nav-height) + var(--ai-sidebar-gap) + 0.75rem);
       right: calc(var(--ai-sidebar-gap) + var(--ai-right-panel-width) - 1rem);
+      opacity: 1;
+      pointer-events: auto;
     }
 
     .ai-right-expand {
@@ -421,44 +426,83 @@
       right: 0.5rem;
       opacity: 0;
       visibility: hidden;
-      transform: translateX(0.25rem);
+      pointer-events: none;
     }
 
     .ai-right-resizer {
-      display: block;
+      display: none;
       top: calc(var(--sl-nav-height) + var(--ai-sidebar-gap));
       right: calc(var(--ai-sidebar-gap) + var(--ai-right-panel-width) - 0.35rem);
       bottom: var(--ai-sidebar-gap);
     }
 
-    .ai-right-tools-visible .ai-right-collapse,
-    .ai-right-tools-visible .ai-right-resizer,
-    .ai-sidebar-dragging .ai-right-collapse,
-    .ai-sidebar-dragging .ai-right-resizer {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateY(0);
-    }
-
-    .ai-right-collapsed .ai-right-collapse,
-    .ai-right-collapsed .ai-right-resizer {
+    .ai-right-collapsed .ai-right-collapse {
       opacity: 0;
       pointer-events: none;
       visibility: hidden;
     }
 
     .ai-right-collapsed .ai-right-expand {
-      opacity: 0.9;
+      opacity: 1;
       pointer-events: auto;
       visibility: visible;
-      transform: translateX(0);
     }
   }
 
   @media (max-width: 49.99rem) {
-    .ai-sidebar-button,
     .ai-sidebar-resizer {
       display: none !important;
+    }
+
+    .ai-left-collapse,
+    .ai-left-expand,
+    .ai-right-collapse,
+    .ai-right-expand {
+      display: flex;
+      top: calc(var(--sl-nav-height) + var(--ai-sidebar-gap) + 0.75rem);
+      opacity: 0.92;
+      transform: translateY(0);
+    }
+
+    .ai-left-collapse {
+      left: calc(var(--ai-sidebar-gap) + var(--ai-left-panel-width) - 1rem);
+      pointer-events: auto;
+    }
+
+    .ai-left-expand {
+      left: 0.5rem;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateX(-0.25rem);
+    }
+
+    .ai-right-collapse {
+      right: calc(var(--ai-sidebar-gap) + var(--ai-right-panel-width) - 1rem);
+      pointer-events: auto;
+    }
+
+    .ai-right-expand {
+      right: 0.5rem;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateX(0.25rem);
+    }
+
+    .ai-left-collapsed .ai-left-collapse,
+    .ai-right-collapsed .ai-right-collapse {
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+    }
+
+    .ai-left-collapsed .ai-left-expand,
+    .ai-right-collapsed .ai-right-expand {
+      opacity: 0.92;
+      pointer-events: auto;
+      visibility: visible;
+      transform: translateX(0);
     }
   }
 </style>

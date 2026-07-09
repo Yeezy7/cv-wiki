@@ -1,0 +1,83 @@
+---
+/**
+ * Mermaid 图表组件
+ *
+ * 用法（在 MDX 文件中直接写）：
+ *   <Mermaid>{`graph TD
+ *     A[开始] --> B[结束]
+ *   `}</Mermaid>
+ *
+ * 或指定图表类型：
+ *   <Mermaid type="sequenceDiagram">{`Alice->>Bob: Hello`}</Mermaid>
+ */
+
+interface Props {
+  type?: string;
+}
+
+const { type } = Astro.props;
+const code = await Astro.slots.render('default');
+// 去除 Astro 渲染时可能包裹的 <p> 标签和多余空白
+const cleanCode = code
+  .replace(/<[^>]*>/g, '')
+  .replace(/&lt;/g, '<')
+  .replace(/&gt;/g, '>')
+  .replace(/&amp;/g, '&')
+  .replace(/&quot;/g, '"')
+  .replace(/&#39;/g, "'")
+  .trim();
+---
+
+<pre class="mermaid" data-type={type}>
+{type ? `${type}\n${cleanCode}` : cleanCode}
+</pre>
+
+<script>
+  // 确保 mermaid 已加载并渲染当前图表
+  async function initMermaid() {
+    if (!(window as any).mermaid) {
+      await new Promise<void>((resolve) => {
+        const check = setInterval(() => {
+          if ((window as any).mermaid) {
+            clearInterval(check);
+            resolve();
+          }
+        }, 100);
+      });
+    }
+    const m = (window as any).mermaid;
+    if (m && !m.__ai_initialized) {
+      m.initialize({ startOnLoad: false, theme: 'dark' });
+      m.__ai_initialized = true;
+    }
+    if (m) {
+      const els = document.querySelectorAll('.mermaid:not([data-processed])');
+      if (els.length > 0) {
+        try {
+          await m.run({ nodes: Array.from(els) as HTMLElement[] });
+        } catch (e) {
+          console.error('Mermaid render error:', e);
+        }
+      }
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMermaid);
+  } else {
+    initMermaid();
+  }
+</script>
+
+<style>
+  .mermaid {
+    display: flex;
+    justify-content: center;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+  }
+
+  .mermaid svg {
+    max-width: 100%;
+    height: auto;
+  }
+</style>

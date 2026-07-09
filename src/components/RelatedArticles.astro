@@ -7,7 +7,6 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 const currentTags: string[] = (entry?.data?.tags as string[]) || [];
 const currentId = entry?.id || '';
 
-// 分类颜色
 const categoryColors: Record<string, string> = {
   cv: 'var(--sl-color-blue)',
   llm: 'var(--sl-color-purple)',
@@ -15,6 +14,25 @@ const categoryColors: Record<string, string> = {
   interview: 'var(--sl-color-orange)',
   guide: 'var(--sl-color-accent)',
 };
+
+type RelatedDoc = {
+  id: string;
+  title: string;
+  category: string;
+  tags: string[];
+};
+
+let docsIndexPromise: Promise<RelatedDoc[]> | undefined;
+
+const getDocsIndex = () =>
+  (docsIndexPromise ??= getCollection('docs').then((docs) =>
+    docs.map((doc) => ({
+      id: doc.id,
+      title: doc.data.title,
+      category: (doc.data.category as string) || '',
+      tags: ((doc.data.tags as string[]) || []).filter(Boolean),
+    }))
+  ));
 
 let scored: Array<{
   title: string;
@@ -26,147 +44,56 @@ let scored: Array<{
 
 try {
   if (currentTags.length > 0) {
-    const allDocs = await getCollection('docs');
+    const allDocs = await getDocsIndex();
 
     scored = allDocs
       .filter((doc) => doc.id !== currentId)
       .map((doc) => {
-        const docTags: string[] = (doc.data.tags as string[]) || [];
-        const sharedTags = currentTags.filter((t) => docTags.includes(t));
+        const sharedTags = currentTags.filter((tag) => doc.tags.includes(tag));
         return {
-          title: doc.data.title,
+          title: doc.title,
           slug: doc.id,
-          category: (doc.data.category as string) || '',
+          category: doc.category,
           score: sharedTags.length,
           sharedTags,
         };
       })
       .filter((item) => item.score > 0)
-      .sort((a, b) => b.score - a.score)
+      .sort((a, b) => b.score - a.score || a.title.localeCompare(b.title, 'zh-CN'))
       .slice(0, 5);
   }
-} catch (e) {
-  // 静默失败
+} catch {
+  scored = [];
 }
 ---
 
-{scored.length > 0 && (
+{(scored.length > 0 || currentTags.length > 0) && (
   <section class="related-articles">
     <h3>相关文章</h3>
-    <ul>
-      {scored.map((article) => (
-        <li>
-          <a href={`${base}${article.slug}/`}>
-            <span class="related-category" style={`color: ${categoryColors[article.category] || 'var(--sl-color-gray-3)'}`}>
-              {article.category.toUpperCase()}
-            </span>
-            <span class="related-title">{article.title}</span>
-            <span class="related-tags">
-              {article.sharedTags.map((tag) => (
-                <span class="related-tag">{tag}</span>
-              ))}
-            </span>
-          </a>
-        </li>
-      ))}
-    </ul>
-  </section>
-)}
-
-<style>
-  .related-articles {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid color-mix(in srgb, var(--sl-color-hairline-light) 60%, transparent);
-  }
-
-  .related-articles h3 {
-    margin: 0 0 1rem;
-    font-size: 1.1rem;
-    color: var(--sl-color-white);
-  }
-
-  .related-articles ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: grid;
-    gap: 0.5rem;
-  }
-
-  .related-articles a {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.6rem 0.8rem;
-    border: 1px solid color-mix(in srgb, var(--sl-color-hairline-light) 40%, transparent);
-    border-radius: var(--ai-panel-radius);
-    color: var(--sl-color-gray-2);
-    text-decoration: none;
-    transition: border-color 0.16s ease, background 0.16s ease;
-  }
-
-  .related-articles a:hover {
-    border-color: var(--sl-color-accent);
-    background: color-mix(in srgb, var(--sl-color-accent) 6%, transparent);
-    color: var(--sl-color-white);
-  }
-
-  .related-category {
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    opacity: 0.7;
-    flex-shrink: 0;
-  }
-
-  .related-title {
-    flex: 1;
-    font-size: 0.9rem;
-  }
-
-  .related-tags {
-    display: flex;
-    gap: 0.3rem;
-    flex-shrink: 0;
-  }
-
-  .related-tag {
-    font-size: 0.65rem;
-    padding: 0.1rem 0.4rem;
-    background: color-mix(in srgb, var(--sl-color-gray-5) 60%, transparent);
-    color: var(--sl-color-gray-3);
-    border-radius: 999px;
-  }
-</style>
-
-{scored.length > 0 && (
-  <section class="related-articles">
-    <h3>相关文章</h3>
-    <ul>
-      {scored.map((article) => (
-        <li>
-          <a href={`${base}${article.slug}/`}>
-            <span class="related-category" style={`color: ${categoryColors[article.category] || 'var(--sl-color-gray-3)'}`}>
-              {article.category.toUpperCase()}
-            </span>
-            <span class="related-title">{article.title}</span>
-            <span class="related-tags">
-              {article.sharedTags.map((tag) => (
-                <span class="related-tag">{tag}</span>
-              ))}
-            </span>
-          </a>
-        </li>
-      ))}
-    </ul>
-  </section>
-)}
-
-{scored.length === 0 && currentTags.length > 0 && (
-  <section class="related-articles">
-    <h3>相关文章</h3>
-    <p class="no-related">暂无相关文章</p>
+    {scored.length > 0 ? (
+      <ul>
+        {scored.map((article) => (
+          <li>
+            <a href={`${base}${article.slug}/`}>
+              <span
+                class="related-category"
+                style={`color: ${categoryColors[article.category] || 'var(--sl-color-gray-3)'}`}
+              >
+                {article.category.toUpperCase()}
+              </span>
+              <span class="related-title">{article.title}</span>
+              <span class="related-tags">
+                {article.sharedTags.map((tag) => (
+                  <span class="related-tag">{tag}</span>
+                ))}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="no-related">暂无相关文章</p>
+    )}
   </section>
 )}
 
@@ -239,95 +166,5 @@ try {
   .no-related {
     color: var(--sl-color-gray-4);
     font-size: 0.85rem;
-  }
-</style>
-
-{scored.length > 0 && (
-  <section class="related-articles">
-    <h3>相关文章</h3>
-    <ul>
-      {scored.map((article) => (
-        <li>
-          <a href={`${base}${article.slug}/`}>
-            <span class="related-category" style={`color: ${categoryColors[article.category] || 'var(--sl-color-gray-3)'}`}>
-              {article.category.toUpperCase()}
-            </span>
-            <span class="related-title">{article.title}</span>
-            <span class="related-tags">
-              {article.sharedTags.map((tag) => (
-                <span class="related-tag">{tag}</span>
-              ))}
-            </span>
-          </a>
-        </li>
-      ))}
-    </ul>
-  </section>
-)}
-
-<style>
-  .related-articles {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid color-mix(in srgb, var(--sl-color-hairline-light) 60%, transparent);
-  }
-
-  .related-articles h3 {
-    margin: 0 0 1rem;
-    font-size: 1.1rem;
-    color: var(--sl-color-white);
-  }
-
-  .related-articles ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: grid;
-    gap: 0.5rem;
-  }
-
-  .related-articles a {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.6rem 0.8rem;
-    border: 1px solid color-mix(in srgb, var(--sl-color-hairline-light) 40%, transparent);
-    border-radius: var(--ai-panel-radius);
-    color: var(--sl-color-gray-2);
-    text-decoration: none;
-    transition: border-color 0.16s ease, background 0.16s ease;
-  }
-
-  .related-articles a:hover {
-    border-color: var(--sl-color-accent);
-    background: color-mix(in srgb, var(--sl-color-accent) 6%, transparent);
-    color: var(--sl-color-white);
-  }
-
-  .related-category {
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    opacity: 0.7;
-    flex-shrink: 0;
-  }
-
-  .related-title {
-    flex: 1;
-    font-size: 0.9rem;
-  }
-
-  .related-tags {
-    display: flex;
-    gap: 0.3rem;
-    flex-shrink: 0;
-  }
-
-  .related-tag {
-    font-size: 0.65rem;
-    padding: 0.1rem 0.4rem;
-    background: color-mix(in srgb, var(--sl-color-gray-5) 60%, transparent);
-    color: var(--sl-color-gray-3);
-    border-radius: 999px;
   }
 </style>

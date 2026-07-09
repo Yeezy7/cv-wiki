@@ -2,14 +2,36 @@
 
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import rehypeSlug from 'rehype-slug';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import rehypeExternalLinks from 'rehype-external-links';
 
 /** 根站 base 路径，用于子站返回首页等场景 */
 export const rootBase = '/ai-wiki/';
 
-/** 各站共享的 markdown 渲染配置（数学公式） */
+/** 各站共享的 markdown 渲染配置（数学公式 + 标题锚点 + 外链处理） */
 export const sharedMarkdown = {
   remarkPlugins: [remarkMath],
-  rehypePlugins: [rehypeKatex],
+  rehypePlugins: [
+    rehypeKatex,
+    rehypeSlug,
+    [
+      rehypeAutolinkHeadings,
+      {
+        behavior: 'append',
+        content: {
+          type: 'element',
+          tagName: 'span',
+          properties: { ariaHidden: 'true', className: ['anchor-link'] },
+          children: [],
+        },
+      },
+    ],
+    [
+      rehypeExternalLinks,
+      { target: '_blank', rel: ['noopener', 'noreferrer'] },
+    ],
+  ],
 };
 
 export const sharedLocales = {
@@ -23,6 +45,7 @@ export const sharedComponents = {
   Head: './src/components/Head.astro',
   SiteTitle: './src/components/SiteTitle.astro',
   MarkdownContent: './src/components/MarkdownContent.astro',
+  Mermaid: './src/components/Mermaid.astro',
 };
 
 export const sharedSocial = [

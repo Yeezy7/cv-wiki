@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import sitemap from '@astrojs/sitemap';
 import { sharedStarlightOpts, sharedMarkdown } from './src/starlight-shared.mjs';
 
 export default defineConfig({
@@ -7,6 +8,7 @@ export default defineConfig({
   base: '/ai-wiki',
   markdown: sharedMarkdown,
   integrations: [
+    sitemap(),
     starlight({
       ...sharedStarlightOpts(''),
       pagination: false,

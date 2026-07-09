@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import sitemap from '@astrojs/sitemap';
 import { sharedStarlightOpts, sharedMarkdown } from '../../src/starlight-shared.mjs';
 
 export default defineConfig({
@@ -7,6 +8,7 @@ export default defineConfig({
   base: '/ai-wiki/cv',
   markdown: sharedMarkdown,
   integrations: [
+    sitemap(),
     starlight({
       ...sharedStarlightOpts('cv'),
       title: 'CV Wiki',
@@ -48,7 +50,7 @@ export default defineConfig({
             { label: 'Dataset', slug: 'pytorch/dataset' },
             { label: 'DataLoader', slug: 'pytorch/dataloader' },
             { label: 'Transforms', slug: 'pytorch/transforms' },
-            { label: '神经网络', slug: 'pytorch/神经网络' },
+            { label: '神经网络', slug: 'pytorch/神经网络/神经网络' },
           ],
         },
       ],

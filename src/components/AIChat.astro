@@ -40,7 +40,7 @@
       <details>
         <summary>API 设置</summary>
         <div class="settings-form">
-          <p class="settings-note">API Key 只保存在当前浏览器。请使用支持浏览器跨域请求的 OpenAI 兼容接口。</p>
+          <p class="settings-note">API Key 仅保存在当前页面内存中，刷新后需要重新输入。请使用支持浏览器跨域请求的 OpenAI 兼容接口。</p>
           <div class="form-group">
             <label for="api-url">API 地址</label>
             <input
@@ -85,15 +85,22 @@
 
     loadSettings() {
       const saved = localStorage.getItem('ai-chat-settings');
-      return saved ? JSON.parse(saved) : {
+      const parsed = saved ? JSON.parse(saved) : {
         apiUrl: 'https://api.openai.com/v1/chat/completions',
-        apiKey: '',
         model: 'gpt-4o-mini'
+      };
+      return {
+        apiUrl: parsed.apiUrl || 'https://api.openai.com/v1/chat/completions',
+        apiKey: '',
+        model: parsed.model || 'gpt-4o-mini'
       };
     }
 
     saveSettings() {
-      localStorage.setItem('ai-chat-settings', JSON.stringify(this.settings));
+      localStorage.setItem('ai-chat-settings', JSON.stringify({
+        apiUrl: this.settings.apiUrl,
+        model: this.settings.model
+      }));
     }
 
     init() {
@@ -102,12 +109,12 @@
         const container = document.getElementById('ai-chat-container');
         const body = document.getElementById('chat-body');
         const btn = document.getElementById('toggle-chat');
-        const isOpen = !body?.classList.contains('collapsed');
+        const nextOpen = body?.classList.contains('collapsed');
         container?.classList.toggle('collapsed');
         body?.classList.toggle('collapsed');
         btn?.classList.toggle('collapsed');
-        btn?.setAttribute('aria-expanded', String(isOpen));
-        localStorage.setItem('ai-chat-open', String(isOpen));
+        btn?.setAttribute('aria-expanded', String(nextOpen));
+        localStorage.setItem('ai-chat-open', String(nextOpen));
       });
 
       // 发送消息
@@ -140,6 +147,7 @@
       document.getElementById('ai-chat-container')?.classList.remove('collapsed');
       document.getElementById('chat-body')?.classList.remove('collapsed');
       document.getElementById('toggle-chat')?.classList.remove('collapsed');
+      document.getElementById('toggle-chat')?.setAttribute('aria-expanded', 'true');
     }
 
     loadSettingsToForm() {

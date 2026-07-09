@@ -4,14 +4,22 @@
   --ai-sidebar-gap: 0.875rem;
   --ai-toc-width: 17.5rem;
   --ai-panel-radius: 0.5rem;
+  --ai-compact-left-max: 17rem;
+  --ai-compact-right-max: 16rem;
   --sl-nav-height: 3.25rem;
   --sl-nav-pad-y: 0.5rem;
 }
 
 @media (min-width: 50rem) {
   :root {
+    --ai-left-panel-width: calc(var(--sl-sidebar-width) - (var(--ai-sidebar-gap) * 1.35));
+    --ai-right-panel-width: calc(var(--ai-toc-width) - var(--ai-sidebar-gap));
     --sl-nav-height: 3.25rem;
     --sl-nav-pad-x: 1.125rem;
+  }
+
+  html[data-has-sidebar] {
+    --sl-content-inline-start: 0px !important;
   }
 
   .header {
@@ -37,9 +45,12 @@
   }
 
   #starlight__sidebar {
-    inset-block: calc(var(--sl-nav-height) + var(--ai-sidebar-gap)) var(--ai-sidebar-gap) !important;
-    inset-inline-start: var(--ai-sidebar-gap) !important;
-    width: calc(var(--sl-sidebar-width) - (var(--ai-sidebar-gap) * 1.35)) !important;
+    position: fixed !important;
+    top: calc(var(--sl-nav-height) + var(--ai-sidebar-gap)) !important;
+    left: var(--ai-sidebar-gap) !important;
+    bottom: var(--ai-sidebar-gap) !important;
+    width: var(--ai-left-panel-width) !important;
+    max-width: calc(100vw - (var(--ai-sidebar-gap) * 2)) !important;
     border: 1px solid color-mix(in srgb, var(--sl-color-hairline-light) 78%, transparent) !important;
     border-radius: var(--ai-panel-radius);
     background:
@@ -47,10 +58,10 @@
     box-shadow:
       0 14px 34px rgba(0, 0, 0, 0.16),
       inset 0 1px 0 color-mix(in srgb, var(--sl-color-white) 6%, transparent);
+    z-index: 20;
     transition:
       transform 0.2s ease,
-      opacity 0.2s ease,
-      width 0.16s ease;
+      opacity 0.2s ease;
   }
 
   #starlight__sidebar .sidebar-content {
@@ -149,7 +160,7 @@
   }
 
   html.ai-left-collapsed[data-has-sidebar] {
-    --sl-content-inline-start: 0px !important;
+    /* 不修改布局变量，保持正文位置不变 */
   }
 
   html.ai-left-collapsed #starlight__sidebar {
@@ -163,58 +174,43 @@
     transition: none !important;
   }
 
-  .main-frame {
-    transition: padding-inline-start 0.2s ease;
-  }
-}
-
-@media (max-width: 71.99rem) {
-  html[data-has-toc] {
-    --sl-mobile-toc-height: 0rem !important;
-  }
-
-  .right-sidebar-container,
-  .right-sidebar {
-    display: none !important;
-    width: 0 !important;
-    min-width: 0 !important;
-    height: 0 !important;
-    overflow: hidden !important;
-    pointer-events: none !important;
-  }
-
-  .main-pane {
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-}
-
-@media (min-width: 72rem) {
   .main-frame > .lg\:sl-flex {
     width: 100%;
     align-items: flex-start;
+    justify-content: center;
+  }
+
+  .main-frame {
+    transition: none !important;
   }
 
   .main-pane {
     order: 1;
-    flex: 1 1 auto !important;
+    flex: 1 1 100% !important;
     min-width: 0;
-    width: auto !important;
+    width: 100% !important;
     --sl-content-margin-inline: auto !important;
   }
 
   html[data-has-sidebar][data-has-toc] .main-pane {
-    width: auto !important;
+    width: 100% !important;
     --sl-content-margin-inline: auto !important;
   }
 
   .right-sidebar-container {
-    order: 2;
-    width: var(--ai-toc-width) !important;
-    min-width: var(--ai-toc-width) !important;
-    flex: 0 0 var(--ai-toc-width) !important;
-    pointer-events: none;
-    transition: width 0.2s ease, min-width 0.2s ease, flex-basis 0.2s ease;
+    position: fixed !important;
+    top: 0;
+    right: 0;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: visible !important;
+    pointer-events: none !important;
+    display: block !important;
+    z-index: 999 !important;
+  }
+
+  .right-sidebar-panel {
+    display: block !important;
   }
 
   .right-sidebar {
@@ -222,8 +218,9 @@
     top: calc(var(--sl-nav-height) + var(--ai-sidebar-gap)) !important;
     right: var(--ai-sidebar-gap) !important;
     left: auto !important;
-    z-index: 20;
-    width: calc(var(--ai-toc-width) - var(--ai-sidebar-gap)) !important;
+    z-index: 999 !important;
+    width: var(--ai-right-panel-width) !important;
+    max-width: calc(100vw - (var(--ai-sidebar-gap) * 2)) !important;
     height: calc(100vh - var(--sl-nav-height) - (var(--ai-sidebar-gap) * 2)) !important;
     padding-top: 0 !important;
     border: 1px solid color-mix(in srgb, var(--sl-color-hairline-light) 78%, transparent) !important;
@@ -310,6 +307,89 @@
   }
 }
 
+@media (min-width: 50rem) and (max-width: 71.99rem) {
+  :root {
+    --ai-left-panel-width: min(
+      calc(var(--sl-sidebar-width) - (var(--ai-sidebar-gap) * 1.35)),
+      calc(100vw - 2.5rem),
+      var(--ai-compact-left-max)
+    );
+    --ai-right-panel-width: min(
+      calc(var(--ai-toc-width) - var(--ai-sidebar-gap)),
+      calc(100vw - 2.5rem),
+      var(--ai-compact-right-max)
+    );
+  }
+
+  html[data-has-toc] {
+    --sl-mobile-toc-height: 0rem !important;
+  }
+}
+
+@media (max-width: 71.99rem) {
+  .main-pane {
+    width: 100% !important;
+    max-width: 100% !important;
+    --sl-content-margin-inline: auto !important;
+  }
+
+  .content-panel > .sl-container {
+    margin-inline: auto !important;
+  }
+
+  .right-sidebar > .lg\:sl-hidden,
+  .right-sidebar mobile-starlight-toc,
+  .right-sidebar mobile-starlight-toc nav {
+    display: none !important;
+  }
+
+  .right-sidebar .right-sidebar-panel,
+  .right-sidebar .right-sidebar-panel.sl-hidden {
+    display: block !important;
+    padding: 0.95rem 0.75rem !important;
+  }
+
+  .right-sidebar .right-sidebar-panel .sl-container {
+    width: auto !important;
+    max-width: none !important;
+  }
+
+  .right-sidebar .right-sidebar-panel h2 {
+    margin: 0 0 0.7rem !important;
+    padding: 0 0.45rem 0.55rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--sl-color-hairline-light) 56%, transparent);
+    font-size: 0.78rem !important;
+    letter-spacing: 0 !important;
+    color: color-mix(in srgb, var(--sl-color-white) 88%, var(--sl-color-green)) !important;
+  }
+
+  .right-sidebar .right-sidebar-panel li {
+    padding-inline-start: calc(var(--depth, 0) * 0.75rem);
+  }
+
+  .right-sidebar .right-sidebar-panel a {
+    display: block;
+    border-radius: var(--ai-panel-radius);
+    padding: 0.34rem 0.5rem !important;
+    color: color-mix(in srgb, var(--sl-color-gray-2) 88%, transparent) !important;
+    transition:
+      background 0.16s ease,
+      color 0.16s ease;
+  }
+
+  .right-sidebar .right-sidebar-panel a:hover,
+  .right-sidebar .right-sidebar-panel a:focus-visible {
+    background: color-mix(in srgb, var(--sl-color-gray-5) 42%, transparent);
+    color: var(--sl-color-white) !important;
+  }
+
+  .right-sidebar .right-sidebar-panel a[aria-current='true'],
+  .right-sidebar .right-sidebar-panel a.active {
+    background: color-mix(in srgb, var(--sl-color-green) 18%, transparent);
+    color: var(--sl-color-white) !important;
+  }
+}
+
 .pagination-links {
   margin-top: 2rem;
   padding-top: 1.5rem;
@@ -330,6 +410,123 @@
 
 /* 移动端适配 */
 @media (max-width: 49.99rem) {
+  :root {
+    --ai-left-panel-width: min(calc(100vw - 3.5rem), 18rem);
+    --ai-right-panel-width: min(calc(100vw - 3.5rem), 15rem);
+  }
+
+  html[data-has-sidebar] {
+    --sl-content-inline-start: 0px !important;
+  }
+
+  html[data-has-sidebar] .header {
+    padding-inline-end: var(--sl-nav-pad-x) !important;
+  }
+
+  html[data-has-toc] {
+    --sl-mobile-toc-height: 0rem !important;
+  }
+
+  .sidebar starlight-menu-button,
+  .sidebar starlight-menu-button button {
+    display: none !important;
+  }
+
+  .main-frame > .lg\:sl-flex {
+    width: 100%;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .sidebar-pane {
+    visibility: visible !important;
+  }
+
+  #starlight__sidebar {
+    position: fixed !important;
+    top: calc(var(--sl-nav-height) + var(--ai-sidebar-gap)) !important;
+    left: var(--ai-sidebar-gap) !important;
+    bottom: var(--ai-sidebar-gap) !important;
+    width: var(--ai-left-panel-width) !important;
+    max-width: calc(100vw - (var(--ai-sidebar-gap) * 2)) !important;
+    border: 1px solid color-mix(in srgb, var(--sl-color-hairline-light) 78%, transparent) !important;
+    border-radius: var(--ai-panel-radius);
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--sl-color-bg-sidebar) 96%, var(--sl-color-white) 4%), var(--sl-color-bg-sidebar));
+    box-shadow:
+      0 14px 34px rgba(0, 0, 0, 0.16),
+      inset 0 1px 0 color-mix(in srgb, var(--sl-color-white) 6%, transparent);
+    z-index: 20;
+    transition:
+      transform 0.2s ease,
+      opacity 0.2s ease;
+  }
+
+  html.ai-left-collapsed #starlight__sidebar {
+    transform: translateX(calc(-100% - var(--ai-sidebar-gap)));
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .right-sidebar-container {
+    position: fixed !important;
+    top: 0;
+    right: 0;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: visible !important;
+    pointer-events: none !important;
+    display: block !important;
+    z-index: 999 !important;
+  }
+
+  .right-sidebar-panel {
+    display: block !important;
+  }
+
+  .right-sidebar {
+    display: block !important;
+    position: fixed !important;
+    top: calc(var(--sl-nav-height) + var(--ai-sidebar-gap)) !important;
+    right: var(--ai-sidebar-gap) !important;
+    left: auto !important;
+    z-index: 999 !important;
+    width: var(--ai-right-panel-width) !important;
+    max-width: calc(100vw - (var(--ai-sidebar-gap) * 2)) !important;
+    height: calc(100vh - var(--sl-nav-height) - (var(--ai-sidebar-gap) * 2)) !important;
+    padding-top: 0 !important;
+    border: 1px solid color-mix(in srgb, var(--sl-color-hairline-light) 78%, transparent) !important;
+    border-radius: var(--ai-panel-radius);
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--sl-color-bg-sidebar) 96%, var(--sl-color-white) 4%), var(--sl-color-bg-sidebar));
+    box-shadow:
+      0 14px 34px rgba(0, 0, 0, 0.14),
+      inset 0 1px 0 color-mix(in srgb, var(--sl-color-white) 6%, transparent);
+    overflow-y: auto;
+    pointer-events: auto;
+    transition:
+      transform 0.2s ease,
+      opacity 0.2s ease;
+  }
+
+  html.ai-right-collapsed .right-sidebar-container {
+    width: 0 !important;
+    min-width: 0 !important;
+    flex-basis: 0 !important;
+    pointer-events: none;
+  }
+
+  html.ai-right-collapsed .right-sidebar {
+    transform: translateX(calc(100% + var(--ai-sidebar-gap)));
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  html.ai-sidebar-initializing #starlight__sidebar,
+  html.ai-sidebar-initializing .right-sidebar {
+    transition: none !important;
+  }
+
   /* 侧边栏优化 */
   .sidebar-pane {
     max-height: 80vh;
@@ -338,6 +535,7 @@
 
   /* 内容区域优化 */
   .main-pane {
+    width: 100% !important;
     padding: 1rem;
   }
 
@@ -525,6 +723,35 @@
 }
 
 /* 返回顶部按钮 */
+
+/* 标题锚点链接 */
+.sl-markdown-content h1 .anchor-link,
+.sl-markdown-content h2 .anchor-link,
+.sl-markdown-content h3 .anchor-link,
+.sl-markdown-content h4 .anchor-link,
+.sl-markdown-content h5 .anchor-link,
+.sl-markdown-content h6 .anchor-link {
+  opacity: 0;
+  margin-left: 0.35em;
+  font-weight: 400;
+  color: var(--sl-color-gray-3);
+  text-decoration: none;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.sl-markdown-content h1:hover .anchor-link,
+.sl-markdown-content h2:hover .anchor-link,
+.sl-markdown-content h3:hover .anchor-link,
+.sl-markdown-content h4:hover .anchor-link,
+.sl-markdown-content h5:hover .anchor-link,
+.sl-markdown-content h6:hover .anchor-link {
+  opacity: 1;
+}
+
+.sl-markdown-content .anchor-link:hover {
+  color: var(--sl-color-accent-high);
+}
+
 .back-to-top {
   position: fixed;
   bottom: 20px;

@@ -1,6 +1,11 @@
 ---
 import Default from '@astrojs/starlight/components/Head.astro';
 import SEOHead from './SEOHead.astro';
+import {
+  narrowViewportMediaQuery,
+  sidebarSizing,
+  sidebarStorageKeys,
+} from '../sidebar-config';
 
 const { starlightRoute } = Astro.locals;
 const entryId = starlightRoute.id ?? starlightRoute.entry.id;
@@ -16,16 +21,9 @@ const shouldInitSidebarState =
 
 {
   shouldInitSidebarState && (
-    <script is:inline>
+    <script is:inline define:vars={{ narrowViewportMediaQuery, sidebarSizing, sidebarStorageKeys }}>
       (() => {
-        const sidebarSizing = {
-          leftMin: 220,
-          leftMax: 420,
-          leftDefault: 300,
-          rightMin: 220,
-          rightMax: 360,
-          rightDefault: 280,
-        };
+        const storageKeys = sidebarStorageKeys;
         const root = document.documentElement;
         const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
         const readStoredValue = (key) => {
@@ -44,7 +42,7 @@ const shouldInitSidebarState =
         root.style.setProperty(
           '--sl-sidebar-width',
           readSize(
-            'ai-left-sidebar-width',
+            storageKeys.leftWidth,
             sidebarSizing.leftDefault,
             sidebarSizing.leftMin,
             sidebarSizing.leftMax
@@ -53,20 +51,21 @@ const shouldInitSidebarState =
         root.style.setProperty(
           '--ai-toc-width',
           readSize(
-            'ai-right-sidebar-width',
+            storageKeys.rightWidth,
             sidebarSizing.rightDefault,
             sidebarSizing.rightMin,
             sidebarSizing.rightMax
           ) + 'px'
         );
-        root.classList.toggle(
-          'ai-left-collapsed',
-          readStoredValue('ai-left-sidebar-collapsed') === 'true'
-        );
-        root.classList.toggle(
-          'ai-right-collapsed',
-          readStoredValue('ai-right-sidebar-collapsed') === 'true'
-        );
+        const isNarrowViewport = window.matchMedia(narrowViewportMediaQuery).matches;
+        // 默认展开：只有当用户明确存储了折叠状态为 'true' 时才折叠
+        // 注意：窄视口下也默认展开，让用户手动控制
+        const leftStored = readStoredValue(storageKeys.leftCollapsed);
+        const rightStored = readStoredValue(storageKeys.rightCollapsed);
+        const leftCollapsed = leftStored === 'true';
+        const rightCollapsed = rightStored === 'true';
+        root.classList.toggle('ai-left-collapsed', leftCollapsed);
+        root.classList.toggle('ai-right-collapsed', rightCollapsed);
       })();
     </script>
   )
@@ -74,3 +73,8 @@ const shouldInitSidebarState =
 
 <Default />
 <SEOHead />
+<script
+  is:inline
+  src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"
+  defer
+></script>
