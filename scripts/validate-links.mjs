@@ -170,11 +170,23 @@ function resolveInternalTarget(page, target) {
 
 function resolveAsset(page, pathWithoutQuery) {
   if (pathWithoutQuery.startsWith('/')) {
-    const publicPath = pathWithoutQuery.startsWith('/ai-wiki/')
-      ? pathWithoutQuery.slice('/ai-wiki'.length)
-      : pathWithoutQuery;
+    for (const site of sites) {
+      if (site.name !== 'root' && (pathWithoutQuery === site.base || pathWithoutQuery.startsWith(`${site.base}/`))) {
+        const sitePublicPath = pathWithoutQuery.slice(site.base.length) || '/';
+        return { assetPath: join(rootDir, 'sites', site.name, 'public', sitePublicPath) };
+      }
+    }
 
-    return { assetPath: join(rootDir, 'public', publicPath) };
+    if (pathWithoutQuery.startsWith('/ai-wiki/')) {
+      return { assetPath: join(rootDir, 'public', pathWithoutQuery.slice('/ai-wiki'.length)) };
+    }
+
+    const sitePublicRoot =
+      page.site.name === 'root'
+        ? join(rootDir, 'public')
+        : join(rootDir, 'sites', page.site.name, 'public');
+
+    return { assetPath: join(sitePublicRoot, pathWithoutQuery) };
   }
 
   return { assetPath: join(dirname(page.file), pathWithoutQuery) };
